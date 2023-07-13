@@ -23,4 +23,7 @@ app.use('/user', userRoute);
 const login = require('./router/user');
 app.use('/login', login);
 
+const reset = require('./router/resetSenha');
+app.use('/reset', reset);
+
 module.exports = app;
