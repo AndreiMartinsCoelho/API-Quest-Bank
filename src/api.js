@@ -26,4 +26,7 @@ app.use('/login', login);
 const reset = require('./router/resetSenha');
 app.use('/reset', reset);
 
+const disciplinha = require('./router/disciplina');
+app.use('/listaDisciplina', disciplinha);
+
 module.exports = app;
