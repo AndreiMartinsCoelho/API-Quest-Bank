@@ -1,10 +1,6 @@
 const disciplinaModel = require('../model/disciplinaModel');
 
 exports.get = async (headers) => {
-    if (headers['perfil'] !== "admin") {
-        return { status: "error", msg: "Operação não permitida. Apenas administradores podem acessar essa função." };
-    }
-    
     try {
         const disciplinas = await disciplinaModel.get();
         return { status: "success", msg: "Disciplinas obtidas com sucesso!", disciplinas };

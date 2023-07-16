@@ -2,7 +2,6 @@ const resetModel = require("../model/resetModel");
 
 exports.changePassword = async (data) => {
   const result = await resetModel.changePassword(data);
-
   if (result.auth) {
     return {
       success: true,
