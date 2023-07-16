@@ -2,9 +2,6 @@ const userModel = require("../model/userModel");
 
 exports.get = async (headers) => {
   let auth;
-  if (headers['perfil'] !== "admin") {
-    return { status: "null", msg: "Operação não permitida", auth };
-  }
   auth = await userModel.verifyJWT(headers['x-access-token'], headers['perfil']);
   let users;
   if (auth.idUser) {
