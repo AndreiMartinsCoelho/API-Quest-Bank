@@ -20,6 +20,3 @@ exports.listar = async (body) => {
         return { status: "error", msg: "Credenciais inválidas. Verifique suas credenciais e tente novamente." };
     }
 };
-
-
-

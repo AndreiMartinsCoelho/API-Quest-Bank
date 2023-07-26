@@ -29,4 +29,7 @@ app.use('/reset', reset);
 const disciplinha = require('./router/disciplina');
 app.use('/listaDisciplina', disciplinha);
 
+const listarTopico = require('./router/listarTopico');
+app.use('/listarTopico', listarTopico);
+
 module.exports = app;
