@@ -32,4 +32,7 @@ app.use('/listaDisciplina', disciplinha);
 const listarTopico = require('./router/listarTopico');
 app.use('/listarTopico', listarTopico);
 
+const criarTopico = require('./router/criarTopico');
+app.use('/criarTopico', criarTopico);
+
 module.exports = app;
