@@ -81,4 +81,3 @@ const list = (data) => {
 };
 
 module.exports = { get, list };
-

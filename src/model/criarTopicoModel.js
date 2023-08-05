@@ -115,13 +115,16 @@ const obterTodosOsTopicos = async () => {
 const obterNovoIdTopico = async () => {
   try {
     const resultados = await new Promise((resolve, reject) => {
-      connection.query('SELECT MAX(id_topico) AS max_id FROM topico', (error, resultados) => {
-        if (error) {
-          resolve(null); // Retorna null em caso de erro
-        } else {
-          resolve(resultados);
+      connection.query(
+        "SELECT MAX(id_topico) AS max_id FROM topico",
+        (error, resultados) => {
+          if (error) {
+            resolve(null); // Retorna null em caso de erro
+          } else {
+            resolve(resultados);
+          }
         }
-      });
+      );
     });
 
     const proximoId = resultados[0]?.max_id ? resultados[0].max_id + 1 : 1;
@@ -175,5 +178,9 @@ const obterPerfilUsuario = async (idProfessor) => {
   }
 };
 
-module.exports = { criarTopico, obterIdDisciplinaPorNome, obterTodosOsTopicos, obterNovoIdTopico };
-
+module.exports = {
+  criarTopico,
+  obterIdDisciplinaPorNome,
+  obterTodosOsTopicos,
+  obterNovoIdTopico,
+};

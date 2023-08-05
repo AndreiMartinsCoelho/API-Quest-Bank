@@ -63,4 +63,3 @@ const changePassword = async (data) => {
 };
 
 module.exports = { changePassword };
-

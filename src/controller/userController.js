@@ -2,7 +2,10 @@ const userModel = require("../model/userModel");
 
 exports.get = async (headers) => {
   let auth;
-  auth = await userModel.verifyJWT(headers['x-access-token'], headers['perfil']);
+  auth = await userModel.verifyJWT(
+    headers["x-access-token"],
+    headers["perfil"]
+  );
   let users;
   if (auth.idUser) {
     if (headers.iduser == auth.idUser) {
@@ -21,7 +24,6 @@ exports.login = async (body) => {
   if (result.auth) {
     return { auth: true, token: result.token, user: result.user };
   } else {
-    return { auth: false, message: 'Credenciais inválidas' };
+    return { auth: false, message: "Credenciais inválidas" };
   }
 };
-
