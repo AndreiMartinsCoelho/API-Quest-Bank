@@ -35,4 +35,7 @@ app.use('/listarTopico', listarTopico);
 const criarTopico = require('./router/criarTopico');
 app.use('/criarTopico', criarTopico);
 
+const listarAlternativas = require('./router/listarAlternativas');
+app.use('/listarAlternativas', listarAlternativas);
+
 module.exports = app;
