@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
 const get = () => {
     return new Promise((resolve, reject) => {
         connection.query(
-            `SELECT a.id_alternativa, a.correta, a.questao_id_questao, q.topico_id_topico AS questao_topico, q.nivel AS questao_nivel, q.tipo AS questao_tipo, q.enunciado AS questao_enunciado, a.enunciado
+            `SELECT a.id_alternativa, a.correta, a.questao_id_questao, a.enunciado
             FROM infocimol.alternativa a
             JOIN questao q ON a.questao_id_questao = q.id_questao;`,
             (error, results) => {
@@ -23,10 +23,6 @@ const get = () => {
                         correta: alternativa.correta,
                         questao:{
                             questao_id_questao : alternativa.questao_id_questao,
-                            questao_enunciado : alternativa.questao_enunciado,
-                            questao_tipo : alternativa.questao_tipo,
-                            questao_nivel : alternativa.questao_nivel,
-                            questao_topico : alternativa.questao_topico,
                         },
                         enunciado: alternativa.enunciado
                     }));
@@ -43,7 +39,7 @@ const list = (data) => {
     const { id } = data;
     return new Promise((resolve, reject) => {
         connection.query(
-            `SELECT a.id_alternativa,a.correta, a.questao_id_questao, q.topico_id_topico AS questao_topico, q.nivel AS questao_nivel ,q.tipo AS questao_tipo, q.enunciado AS questao_enunciado, a.enunciado
+            `SELECT a.id_alternativa,a.correta, a.questao_id_questao, a.enunciado
             FROM infocimol.alternativa a
             JOIN questao q ON a.questao_id_questao = q.id_questao,
             WHERE a.id_alternativa = ?;`,
@@ -57,10 +53,6 @@ const list = (data) => {
                         correta: alternativa.correta,
                         questao:{
                             questao_id_questao : alternativa.questao_id_questao,
-                            questao_enunciado : alternativa.questao_enunciado,
-                            questao_tipo : alternativa.questao_tipo,
-                            questao_nivel : alternativa.questao_nivel,
-                            questao_topico : alternativa.questao_topico,
                         },
                         enunciado: alternativa.enunciado
                     }));
