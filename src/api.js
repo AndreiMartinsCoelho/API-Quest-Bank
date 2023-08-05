@@ -41,4 +41,7 @@ app.use('/listarAlternativas', listarAlternativas);
 const criarAlternativas = require('./router/criarAlternativas');
 app.use('/criarAlternativas', criarAlternativas);
 
+const listarQuestao = require('./router/listarQuestao');
+app.use('/listarQuestao', listarQuestao);
+
 module.exports = app;
