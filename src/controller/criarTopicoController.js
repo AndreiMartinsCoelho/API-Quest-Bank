@@ -20,7 +20,7 @@ exports.criar = async (data) => {
       };
     }
 
-    const disciplinaId = await criarTopicoModel.getDisciplinaIdByNome(
+    const disciplinaId = await criarTopicoModel.obterIdDisciplinaPorNome(
       nome_disciplina
     );
 
@@ -31,7 +31,7 @@ exports.criar = async (data) => {
       };
     }
 
-    const newTopic = await criarTopicoModel.createTopic(
+    const newTopic = await criarTopicoModel.criarTopico(
       enunciado,
       disciplinaId,
       professorId
@@ -53,7 +53,7 @@ exports.criar = async (data) => {
 
 exports.get = async () => {
   try {
-    const topics = await criarTopicoModel.getAllTopics();
+    const topics = await criarTopicoModel.obterTodosOsTopicos();
     return { status: "success", msg: "Tópicos obtidos com sucesso!", topics };
   } catch (error) {
     console.error("Erro ao obter tópicos:", error);
