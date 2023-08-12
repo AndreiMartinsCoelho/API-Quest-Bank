@@ -27,17 +27,17 @@ const get = async () => {
 // Função para realizar o login do usuário
 const login = async (data) => {
   const { email, senha } = data;
-
+  const md5 = require("md5")
   return new Promise((resolve, reject) => {
     const sql =
-      "SELECT p.id_pessoa as id, p.nome, p.email, " +
-      "(SELECT COUNT(pessoa_id_pessoa) FROM professor WHERE pessoa_id_pessoa=p.id_pessoa) as professor, " +
-      "(SELECT COUNT(pessoa_id_pessoa) FROM administrador WHERE pessoa_id_pessoa=p.id_pessoa) as admin " +
-      "FROM usuario u " +
-      "JOIN pessoa p ON p.id_pessoa=u.pessoa_id_pessoa " +
-      "WHERE p.email = ? AND u.senha = ?";
+      `SELECT p.id_pessoa as id, p.nome, p.email, ` +
+      `(SELECT COUNT(pessoa_id_pessoa) FROM professor WHERE pessoa_id_pessoa=p.id_pessoa) as professor, ` +
+      `(SELECT COUNT(pessoa_id_pessoa) FROM administrador WHERE pessoa_id_pessoa=p.id_pessoa) as admin ` +
+      `FROM usuario u ` +
+      `JOIN pessoa p ON p.id_pessoa=u.pessoa_id_pessoa ` +
+      `WHERE p.email = ? AND u.senha = ?`;
 
-    connection.query(sql, [email, senha], (error, results) => {
+    connection.query(sql, [email, md5(senha)], (error, results) => {
       if (error) {
         reject(error);
       } else {

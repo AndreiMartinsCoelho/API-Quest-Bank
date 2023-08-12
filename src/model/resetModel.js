@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
 // Função para trocar a senha do usuário
 const changePassword = async (data) => {
   const { email, novaSenha, confirmSenha } = data;
-
+  const MD5 = require("md5");
   return new Promise((resolve, reject) => {
     const sql =
       "SELECT p.id_pessoa as id, p.nome, p.email " +
@@ -29,7 +29,7 @@ const changePassword = async (data) => {
 
           console.log("Fez a troca de senha!");
 
-          if (novaSenha !== confirmSenha) {
+          if (MD5(novaSenha) !== MD5(confirmSenha)) {
             // Se a nova senha e a confirmação de senha não coincidirem, define o resultado como autenticação falsa
             result = {
               auth: false,
@@ -39,9 +39,9 @@ const changePassword = async (data) => {
           } else {
             // Atualiza a senha do usuário no banco de dados
             const updateSql =
-              "UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?";
+              `UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?`;
             console.log(updateSql);
-            connection.query(updateSql, [novaSenha, id], (error) => {
+            connection.query(updateSql, [MD5(novaSenha), id], (error) => {
               if (error) {
                 // Em caso de erro ao atualizar a senha, rejeita a Promise com o erro
                 reject(error);
