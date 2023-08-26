@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
 const get = () => {
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, q.tipo, q.nivel, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
+      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
       a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
       FROM infocimol.questao q
       JOIN topico t ON q.topico_id_topico = t.id_topico
@@ -27,8 +27,10 @@ const get = () => {
             const {
               id_questao,
               enunciado,
+              Enunciado_imagem,
               tipo,
               nivel,
+              resposta,
               professor_nome,
               professor_pessoa_id_pessoa,
               topico_id_topico,
@@ -43,8 +45,10 @@ const get = () => {
               questoes[id_questao] = {
                 id_questao,
                 enunciado,
+                Enunciado_imagem,
                 tipo,
                 nivel,
+                resposta,
                 professor: {
                   professor_id_professor: professor_pessoa_id_pessoa,
                   professor_nome,
@@ -80,7 +84,7 @@ const list = (data) => {
   const { id } = data;
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, q.tipo, q.nivel, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
+      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, q.tipo, q.Enunciado_imagem, q.resposta, q.nivel, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
       a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
       FROM infocimol.questao q
       JOIN topico t ON q.topico_id_topico = t.id_topico
@@ -98,8 +102,10 @@ const list = (data) => {
             const {
               id_questao,
               enunciado,
+              Enunciado_imagem,
               tipo,
               nivel,
+              resposta,
               professor_nome,
               professor_pessoa_id_pessoa,
               topico_id_topico,
@@ -113,8 +119,10 @@ const list = (data) => {
             if (!questao.id_questao) {
               questao.id_questao = id_questao;
               questao.enunciado = enunciado;
+              questao.Enunciado_imagem = Enunciado_imagem;
               questao.tipo = tipo;
               questao.nivel = nivel;
+              questao.resposta = resposta;
               questao.professor = {
                 professor_id_professor: professor_pessoa_id_pessoa,
                 professor_nome,
