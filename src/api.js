@@ -47,4 +47,7 @@ app.use('/listarQuestao', listarQuestao);
 const criarQuestao = require('./router/criarQuestao');
 app.use('/criarQuestao', criarQuestao);
 
+const listarProva = require('./router/listarProva');
+app.use('/listarProva', listarProva);
+
 module.exports = app;
