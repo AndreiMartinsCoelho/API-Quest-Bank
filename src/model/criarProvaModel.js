@@ -7,6 +7,7 @@ const connection = mysql.createConnection({
   database: "infocimol",
 });
 
+//Função para pegar as prova
 const get = () => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -27,10 +28,8 @@ const get = () => {
                 formato: prova.formato,
                 tipo: prova.tipo,
                 criado_por: {
-                  professor: {
-                    professor_id: prova.professor_pessoa_id_pessoa,
-                    professor_nome: prova.professor_nome,
-                  },
+                  professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
+                  professor_nome: prova.professor_nome,
                 },
                 descricao: prova.descricao,
                 questoes: questoes,
@@ -44,36 +43,60 @@ const get = () => {
   });
 };
 
+//Função para criar uma prova
 const criar = (novaProva) => {
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
+    connection.beginTransaction(async (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
       connection.query(
         `INSERT INTO infocimol.prova (descricao, formato, tipo, professor_pessoa_id_pessoa, enunciado)
         VALUES (?, ?, ?, ?, ?);`,
-        [novaProva.descricao, novaProva.formato, novaProva.tipo, novaProva.professorId, novaProva.enunciado],
+        [
+          novaProva.descricao,
+          novaProva.formato,
+          novaProva.tipo,
+          novaProva.professorId,
+          novaProva.enunciado,
+        ],
         async (error, result) => {
           if (error) {
-            reject(error);
+            connection.rollback(() => reject(error));
           } else {
             const novaProvaId = result.insertId;
-            // Busque os detalhes da prova recém-criada usando o novaProvaId
-            connection.query(
-              `SELECT * FROM infocimol.prova WHERE id_prova = ?;`,
-              [novaProvaId],
-              async (error, results) => {
-                if (error) {
-                  reject(error);
-                } else {
-                  const provaDetalhes = results[0]; // Supondo que apenas um resultado é retornado
-                  resolve({ novaProvaId, provaDetalhes });
-                }
-              }
-            );
+
+            try {
+              await inserirQuestoes(novaProvaId, novaProva.questoes);
+              connection.commit(() => {
+                connection.query(
+                  `SELECT * FROM infocimol.prova WHERE id_prova = ?;`,
+                  [novaProvaId],
+                  async (error, results) => {
+                    if (error) {
+                      reject(error);
+                    } else {
+                      const provaDetalhes = results[0];
+                      const questoes = await getQuestoes(novaProvaId);
+                      resolve({ novaProvaId, provaDetalhes, questoes });
+                    }
+                  }
+                );
+              });
+            } catch (error) {
+              connection.rollback(() => reject(error));
+            }
+            
           }
         }
       );
     });
+  });
 };
 
+//Função para obter as prova
 const listar = (data) => {
   const { id } = data;
   return new Promise((resolve, reject) => {
@@ -112,44 +135,44 @@ const listar = (data) => {
   });
 };
 
+//Função para obter as questões de uma prova
 const getQuestoes = (provaId) => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        `SELECT q.id_questao, q.enunciado AS questao_enunciado, q.Enunciado_imagem AS questao_enunciado_imagem, q.tipo AS questao_tipo, q.nivel AS questao_nivel,
-        pp.id_pessoa AS professor_id_professor, pp.nome AS professor_nome,
-        t.id_topico AS topico_id_topico, t.enunciado AS topico_enunciado
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `SELECT q.enunciado AS questao_enunciado
         FROM infocimol.questao_prova qp
         JOIN questao q ON qp.questao_id_questao = q.id_questao
-        JOIN pessoa pp ON q.professor_pessoa_id_pessoa = pp.id_pessoa
-        JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
-        JOIN topico t ON q.topico_id_topico = t.id_topico
         WHERE qp.prova_id_prova = ?;`,
-        [provaId],
-        (error, results) => {
-          if (error) {
-            reject(error);
-          } else {
-            const questoes = results.map((questao) => ({
-              id_questao: questao.id_questao,
-              enunciado: questao.questao_enunciado,
-              Enunciado_imagem: questao.questao_enunciado_imagem,
-              tipo: questao.questao_tipo,
-              nivel: questao.questao_nivel,
-              professor: {
-                professor_id_professor: questao.professor_id_professor,
-                professor_nome: questao.professor_nome,
-              },
-              topico: {
-                topico_id_topico: questao.topico_id_topico,
-                topico_enunciado: questao.topico_enunciado,
-              }
-            }));
-            resolve(questoes);
-          }
+      [provaId],
+      (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          const questoes = results.map((questao) => questao.questao_enunciado);
+          resolve(questoes);
         }
-      );
-    });
-  };
-  
+      }
+    );
+  });
+};
 
-module.exports = {get, criar, listar, getQuestoes };
+//Função para inserir as questões de uma prova
+const inserirQuestoes = (provaId, questoes) => {
+  return new Promise((resolve, reject) => {
+    const values = questoes.map((questaoId) => [questaoId, provaId]);
+    const insertQuery = `
+      INSERT INTO infocimol.questao_prova (questao_id_questao, prova_id_prova)
+      VALUES ?;
+    `;
+
+    connection.query(insertQuery, [values], (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+};
+
+module.exports = { get, criar, listar, getQuestoes, inserirQuestoes };

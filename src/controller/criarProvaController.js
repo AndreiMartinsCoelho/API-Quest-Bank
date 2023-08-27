@@ -19,21 +19,39 @@ exports.get = async (headers) => {
 };
 
 exports.criar = async (body) => {
-    const result = await criarProvaModel.criar(body);
-    if (result.novaProvaId) {
-        const provaCriada = result.provaDetalhes;
+  const result = await criarProvaModel.criar(body);
+  if (result.novaProvaId) {
+    const provaCriada = result.provaDetalhes;
+    
+    const questoes = result.questoes.map((questaoId) => {
+      const questaoEncontrada = body.questoes.find(
+        (questao) => questao.id_questao === questaoId
+      );
+    
+      if (questaoEncontrada) {
         return {
-            status: "success",
-            msg: "Prova criada com sucesso!",
-            provas: [provaCriada], // Aqui estamos retornando a prova criada dentro de um array
+          enunciado_questao: questaoId,
         };
-    } else {
-        // Tratar caso em que a prova não foi criada
+      }else{
         return {
-            status: "error",
-            msg: "Erro ao criar a prova. Verifique os dados e tente novamente.",
+          id_questao: questaoId,
+          enunciado: "Questão não encontrada",
         };
-    }
-};
+      }
+    });
+    
 
-  
+    return {
+      status: "success",
+      msg: "Prova criada com sucesso!",
+      provas: [provaCriada],
+      questoes: questoes,
+    };
+  } else {
+    // Tratar caso em que a prova não foi criada
+    return {
+      status: "error",
+      msg: "Erro ao criar a prova. Verifique os dados e tente novamente.",
+    };
+  }
+};
