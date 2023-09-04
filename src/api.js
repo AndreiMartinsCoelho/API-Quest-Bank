@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+// const middleware = require('middleware');
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -52,5 +53,8 @@ app.use('/listarProva', listarProva);
 
 const criarProva = require('./router/criarProva');
 app.use('/criarProva', criarProva);
+
+const config = require('./config');
+app.use(config);
 
 module.exports = app;
