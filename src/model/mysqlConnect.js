@@ -1,22 +1,21 @@
-const mysql = require("mysql2/promise");
+const mysql = require("mysql");
 
-async function connect() {
+function query() {
   if (global.connection && global.connection.state !== "disconnected") {
     return global.connection;
   }
 
-  const connection = await mysql.createConnection({
-    host: 'mysql.infocimol.com.br',
-    user: 'infocimol',
-    password: 'c1i2m3o4l5',
-    database: 'infocimol',
-  });
+  const connection = mysql.createConnection({
+    host:process.env.DB_HOST,
+    user:process.env.DB_USER,
+    port:process.env.DB_PORT,
+    password:process.env.DB_PASSWORD,
+    database:process.env.DB_DATABASE,
+  });  
 
   console.log("Conectou no MySQL!");
-
   global.connection = connection;
   return connection;
 }
 
-module.exports = { connect };
-
+module.exports = { query };

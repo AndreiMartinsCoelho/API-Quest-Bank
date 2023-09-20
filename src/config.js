@@ -1,8 +1,8 @@
 module.exports = {
-    BASE_URL: 'http://localhost:3000',
     DB_HOST:'mysql.infocimol.com.br',
-    DB_USER:'root',
-    DB_USER_PASS:'c1i2m3o4l5',
+    DB_USER:'infoCimol',
+    DB_PORT:'3306',
+    DB_PASSWORDS:'c1i2m3o4l5',
     DB_DATABASE:'infocimol',
 
     async headers(){
@@ -16,7 +16,7 @@ module.exports = {
               { key: 'Access-Control-Allow-Credentials', value: true },
               { key: 'x-access-token', value: 'true'},
               { key: 'perfil', value: 'admin'}
-            ],    
+            ],
           },
         ];
     },

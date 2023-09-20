@@ -1,18 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-// const middleware = require('middleware');
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const {
-    BASE_URL,
     DB_HOST,
     DB_USER,
     DB_USER_PASS,
-    DB_DATEBASE
+    DB_DATEBASE,
+    DB_PORT
 } = require('./config');
 
 const router = require('./router/route');
@@ -24,7 +23,7 @@ app.use('/user', userRoute);
 const login = require('./router/user');
 app.use('/login', login);
 
-const reset = require('./router/resetSenha');
+const reset = require('./router/user');
 app.use('/reset', reset);
 
 const disciplinha = require('./router/disciplina');
@@ -54,7 +53,7 @@ app.use('/listarProva', listarProva);
 const criarProva = require('./router/criarProva');
 app.use('/criarProva', criarProva);
 
-const config = require('./config');
-app.use(config);
+// const config = require('./config');
+// app.use(config);
 
 module.exports = app;

@@ -22,7 +22,7 @@
     "md5": "^2.3.0",
     "middleware": "^1.0.0",
     "mysql": "^2.18.1",
-    "mysql2": "^3.5.1",
+    "mysql2": "^3.6.1",
     "redis-cache": "^0.2.1",
     "render": "^0.1.4",
     "tiny-lru-cache": "^1.0.1",
