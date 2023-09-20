@@ -50,16 +50,20 @@ app.use('/listarAlternativas', listarAlternativas);
 const criarAlternativas = require('./router/Alternativa');
 app.use('/criarAlternativas', criarAlternativas);
 
-const listarQuestao = require('./router/listarQuestao');
+//Rota para listar as questões
+const listarQuestao = require('./router/Questao');
 app.use('/listarQuestao', listarQuestao);
 
-const criarQuestao = require('./router/criarQuestao');
+//Rota para criar as questões
+const criarQuestao = require('./router/Questao');
 app.use('/criarQuestao', criarQuestao);
 
-const listarProva = require('./router/listarProva');
+//Rota para listar as provas
+const listarProva = require('./router/Prova');
 app.use('/listarProva', listarProva);
 
-const criarProva = require('./router/criarProva');
+//Rota para criar as provas
+const criarProva = require('./router/Prova');
 app.use('/criarProva', criarProva);
 
 // const config = require('./config');
