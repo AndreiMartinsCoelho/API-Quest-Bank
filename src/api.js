@@ -18,6 +18,8 @@ const {
 const router = require('./router/route');
 app.use(router);
 
+//--------------Rotas de usuário----------------//
+
 //eota para o usuário
 const userRoute = require("./router/user");
 app.use('/user', userRoute);
@@ -30,9 +32,13 @@ app.use('/login', login);
 const reset = require('./router/user');
 app.use('/reset', reset);
 
+//-----------------------Rotas de disciplina-----------------------//
+
 //Rota para listar as disciplinas
 const disciplinha = require('./router/disciplina');
 app.use('/listaDisciplina', disciplinha);
+
+//-----------------------Rotas de topico-----------------------//
 
 //Rota para listar os tópicos
 const listarTopico = require('./router/Topico');
@@ -54,6 +60,8 @@ app.use('/editarTopico', editarTopico);
 const listaId = require('./router/Topico');
 app.use('/listaId', listaId);
 
+//-----------------------Rotas de alternativa-----------------------//
+
 //Rota para listar as alternativas
 const listarAlternativas = require('./router/Alternativa');
 app.use('/listarAlternativas', listarAlternativas);
@@ -61,6 +69,8 @@ app.use('/listarAlternativas', listarAlternativas);
 //Rota para criar as alternativas
 const criarAlternativas = require('./router/Alternativa');
 app.use('/criarAlternativas', criarAlternativas);
+
+//-----------------------Rotas de questão-----------------------//
 
 //Rota para listar as questões
 const listarQuestao = require('./router/Questao');
@@ -70,6 +80,20 @@ app.use('/listarQuestao', listarQuestao);
 const criarQuestao = require('./router/Questao');
 app.use('/criarQuestao', criarQuestao);
 
+//Rota para editar as questões
+const editarQuestao = require('./router/Questao');
+app.use('/editarQuestao', editarQuestao);
+
+//Rota para excluir as questões
+const excluirQuestao = require('./router/Questao');
+app.use('/excluirQuestao', excluirQuestao);
+
+//Rota para obter uma questão específica pelo seu ID
+const obterQuestao = require('./router/Questao');
+app.use('/obterQuestao', obterQuestao);
+
+//-------------Rotas de prova----------------//
+
 //Rota para listar as provas
 const listarProva = require('./router/Prova');
 app.use('/listarProva', listarProva);
@@ -77,8 +101,6 @@ app.use('/listarProva', listarProva);
 //Rota para criar as provas
 const criarProva = require('./router/Prova');
 app.use('/criarProva', criarProva);
-
-
 
 // const config = require('./config');
 // app.use(config);

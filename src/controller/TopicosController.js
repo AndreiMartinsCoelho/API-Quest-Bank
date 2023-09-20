@@ -119,8 +119,7 @@ exports.editar = async (req, res) => {
         if (result) {
             return res.json({
                 status: "success",
-                msg: "Tópico editado com sucesso!",
-                topico: result,
+                msg: "Tópico editado com sucesso!"
             });
         } else {
             return res.status(500).json({

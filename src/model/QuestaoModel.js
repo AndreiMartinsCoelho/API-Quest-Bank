@@ -244,13 +244,12 @@ const create = (data) => {
 const getQuestionDetails = (idQuestao) => {
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT SQL_NO_CACHE q.id_questao
-      SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome
-      FROM questao q
-      JOIN topico t ON q.topico_id_topico = t.id_topico
-      JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
-      JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
-      ORDER BY q.id_questao DESC`,
+      `SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome
+        FROM questao q
+        JOIN topico t ON q.topico_id_topico = t.id_topico
+        JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+        JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+        WHERE q.id_questao = ?`,
       [idQuestao],
       (error, results) => {
         if (error) {
@@ -283,4 +282,106 @@ const getQuestionDetails = (idQuestao) => {
   });
 };
 
-module.exports = { get, list, create, getQuestionDetails };
+//Função para editar questao por ID
+const editarQuestao = async (
+  tipo,
+  nivel,
+  enunciado,
+  Enunciado_imagem,
+  resposta,
+  idQuestao
+) => {
+  try {
+    const resultados = await new Promise((resolve, reject) => {
+      connection.query(
+        `UPDATE questao SET tipo = ?, nivel = ?, enunciado = ?, Enunciado_imagem = ?, resposta = ? WHERE id_questao = ?`,
+        [tipo, nivel, enunciado, Enunciado_imagem, resposta, idQuestao],
+        (error, resultados) => {
+          if (error) {
+            reject(error); // Rejeita a Promise em caso de erro
+          } else {
+            resolve(resultados);
+          }
+        }
+      );
+    });
+    return resultados;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//Função para excluir questao por ID
+const excluirQuestao = async (idQuestao) => {
+  try {
+    const resultados = await new Promise((resolve, reject) => {
+      connection.query(
+        `DELETE FROM questao WHERE id_questao = ?`,
+        [idQuestao],
+        (error, resultados) => {
+          if (error) {
+            reject(error); // Rejeita a Promise em caso de erro
+          } else {
+            resolve(resultados);
+          }
+        }
+      );
+    });
+    return resultados;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//Função para obter uma questao específico pelo seu ID
+const verQuestao = async (idQuestao) => {
+    try {
+        const resultados = await new Promise((resolve, reject) => {
+            connection.query(
+                `SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome
+                FROM questao q
+                JOIN topico t ON q.topico_id_topico = t.id_topico
+                JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+                JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+                WHERE q.id_questao = ?`,
+                [idQuestao],
+                (error, resultados) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(resultados);
+                    }
+                }
+            );
+        });
+        const questao = resultados.map((questao) => ({
+            id_questao: questao.id_questao,
+            enunciado: questao.enunciado,
+            Enunciado_imagem: questao.Enunciado_imagem,
+            tipo: questao.tipo,
+            nivel: questao.nivel,
+            resposta: questao.resposta,
+            professor: {
+                professor_id_professor: questao.professor_pessoa_id_pessoa,
+                professor_nome: questao.professor_nome,
+            },
+            topico: {
+                topico_id_topico: questao.id_topico,
+                topico_enunciado: questao.topico,
+            },
+        }));
+        return questao[0];
+    } catch (error) {
+        return null; // Retorna null em caso de erro
+    }
+}
+
+module.exports = {
+  get,
+  list,
+  create,
+  getQuestionDetails,
+  editarQuestao,
+  excluirQuestao,
+  verQuestao,
+};

@@ -18,6 +18,15 @@ QuestaoRouter.get('/listarQuestao', async(req, res, next)=>{
 QuestaoRouter.post('/', async(req, res, next)=>{
     user=await QuestaoController.criar(req.body);
     res.status(200).send(user);
-})
+});
+
+//Função para editar a questão
+QuestaoRouter.put('/:id', QuestaoController.editar);
+
+//Função para excluir a questão
+QuestaoRouter.delete('/:id', QuestaoController.excluir);
+
+//Função para obter uma questão específica pelo seu ID
+QuestaoRouter.get('/:id', QuestaoController.obterQuestao);
 
 module.exports = QuestaoRouter;

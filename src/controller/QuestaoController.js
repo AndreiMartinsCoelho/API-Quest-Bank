@@ -56,3 +56,77 @@ exports.criar = async (body) => {
       };
     }
 };
+
+//Função para editar a questão
+exports.editar = async (req, res) => {
+    const idQuestao = req.params.id;
+    const { tipo, nivel, enunciado, Enunciado_imagem, resposta } = req.body;
+    try {
+        const success = await QuestaoModel.editarQuestao(tipo, nivel, enunciado, Enunciado_imagem, resposta, idQuestao);
+        if (success) {
+            return res.json({
+                status: "success",
+                msg: "Questão editada com sucesso!"
+            });
+        } else {
+            return res.status(500).json({
+                status: "error",
+                msg: "Erro ao editar a questão."
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            msg: "Erro ao editar a questão."
+        });
+    }
+}
+
+//Função para excluir a questão
+exports.excluir = async (req, res) => {
+    const idQuestao = req.params.id;
+    try {
+        const success = await QuestaoModel.excluirQuestao(idQuestao);
+        if (success) {
+            return res.json({
+                status: "success",
+                msg: "Questão excluída com sucesso! E todas as suas alternativas também foram excluídas(Todas as alternativas que estavam relacionadas a essa questão)."
+            });
+        } else {
+            return res.status(500).json({
+                status: "error",
+                msg: "Erro ao excluir a questão.",
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            msg: "Erro ao excluir a questão.",
+        });
+    }
+};
+
+//Função para obter uma questao específica pelo id
+exports.obterQuestao = async (req, res) => {
+    const idQuestao = req.params.id;
+    try {
+        const result = await QuestaoModel.verQuestao(idQuestao);
+        if (result) {
+            return res.json({
+                status: "success",
+                msg: "Questão obtida com sucesso!",
+                questao: result
+            });
+        } else {
+            return res.status(500).json({
+                status: "error",
+                msg: "Erro ao obter a questão.",
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            msg: "Erro ao obter a questão.",
+        });
+    }
+};
