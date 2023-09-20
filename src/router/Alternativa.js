@@ -20,4 +20,13 @@ AlternativasRouter.post('/', async(req, res, next)=>{
     res.status(200).send(user);
 })
 
+//Função para editar alternativas
+AlternativasRouter.put('/:id', AlternativasController.editar);
+
+//Função para excluir alternativas
+AlternativasRouter.delete('/:id', AlternativasController.excluir);
+
+//Função para obter uma alternativa específica pelo seu ID
+AlternativasRouter.get('/:id', AlternativasController.obterAlternativa);
+
 module.exports = AlternativasRouter;

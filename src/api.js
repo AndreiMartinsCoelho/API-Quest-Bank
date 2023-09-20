@@ -70,6 +70,18 @@ app.use('/listarAlternativas', listarAlternativas);
 const criarAlternativas = require('./router/Alternativa');
 app.use('/criarAlternativas', criarAlternativas);
 
+//Rota para editar as alternativas
+const editarAlternativas = require('./router/Alternativa');
+app.use('/editarAlternativas', editarAlternativas);
+
+//Rota para excluir as alternativas
+const excluirAlternativas = require('./router/Alternativa');
+app.use('/excluirAlternativas', excluirAlternativas);
+
+//Rota para obter uma alternativa específica pelo seu ID
+const obterAlternativa = require('./router/Alternativa');
+app.use('/verAlternativa', obterAlternativa);
+
 //-----------------------Rotas de questão-----------------------//
 
 //Rota para listar as questões

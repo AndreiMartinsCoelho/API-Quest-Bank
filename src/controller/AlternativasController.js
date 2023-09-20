@@ -79,3 +79,77 @@ exports.criar = async (data) => {
     };
   }
 };
+
+//Função para editar a alternativa
+exports.editar = async (req, res) => {
+    const idAlternativa = req.params.id;
+    const { enunciado, correta } = req.body;
+    try {
+        const success = await AlternativasModel.editarAlternativa(enunciado, correta, idAlternativa);
+        if (success) {
+            return res.json({
+                status: "success",
+                msg: "Alternativa editada com sucesso!"
+            });
+        } else {
+            return res.status(500).json({
+                status: "error",
+                msg: "Erro ao editar a alternativa. Por favor, tente novamente."
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            msg: "Erro ao editar a alternativa. Por favor, tente novamente."
+        });
+    }
+}
+
+//Função para excluir a alternativa
+exports.excluir = async (req, res) => {
+    const idAlternativa = req.params.id;
+    try {
+        const success = await AlternativasModel.excluirAlternativa(idAlternativa);
+        if (success) {
+            return res.json({
+                status: "success",
+                msg: "Alternativa excluída com sucesso!"
+            });
+        } else {
+            return res.status(500).json({
+                status: "error",
+                msg: "Erro ao excluir a alternativa. Por favor, tente novamente."
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            msg: "Erro ao excluir a alternativa. Por favor, tente novamente."
+        });
+    }
+}
+
+//Função para obter uma alternativa pelo id
+exports.obterAlternativa = async (req, res) => {
+    const idAlternativa = req.params.id;
+    try {
+        const result = await AlternativasModel.obterAlternativaPorId(idAlternativa);
+        if (result) {
+            return res.json({
+                status: "success",
+                msg: "Alternativa obtida com sucesso!",
+                alternativa: result,
+            });
+        } else {
+            return res.status(500).json({
+                status: "error",
+                msg: "Erro ao obter a alternativa. Por favor, tente novamente."
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            msg: "Erro ao obter a alternativa. Por favor, tente novamente."
+        });
+    }
+}

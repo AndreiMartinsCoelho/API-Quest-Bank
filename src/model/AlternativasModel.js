@@ -145,10 +145,94 @@ const list = (data) => {
   });
 };
 
+//Função para editar uma alternativa
+const editarAlternativa = async (enunciado, correta, idAlternativa) => {
+    try {
+        await new Promise((resolve, reject) => {
+            connection.query(
+                `UPDATE alternativa SET enunciado = ?, correta = ? WHERE id_alternativa = ?`,
+                [enunciado, correta, idAlternativa],
+                (error) => {
+                    if (error) {
+                        resolve(null); // Retorna null em caso de erro
+                    } else {
+                        resolve();
+                    }
+                }
+            );
+        });
+
+        return {
+            id_alternativa: idAlternativa,
+            enunciado,
+            correta,
+        };
+    } catch (error) {
+        throw error;
+    }
+}
+
+//Função para excluir uma alternativa
+const excluirAlternativa = (idAlternativa) =>{
+    return new Promise((resolve, reject) => {
+        connection.query(
+        `DELETE FROM alternativa WHERE id_alternativa = ?`,
+        [idAlternativa],
+            (error, results) => {
+                if (error) {
+                reject(error);
+                } else {
+                resolve(results);
+                }
+            }
+        );
+    });
+}
+
+//Função para obter uma alternativa específica pelo seu ID
+const obterAlternativaPorId = async (idAlternativa) => {
+    try {
+        const resultados = await new Promise((resolve, reject) => {
+            connection.query(
+            `SELECT a.id_alternativa, a.enunciado, a.correta, a.questao_id_questao
+            FROM infocimol.alternativa a
+            JOIN questao q ON a.questao_id_questao = q.id_questao
+            WHERE a.id_alternativa = ?`,
+            [idAlternativa],
+            (error, resultados) => {
+                if (error) {
+                resolve(null); // Retorna null em caso de erro
+                } else {
+                resolve(resultados);
+                }
+            }
+            );
+        });
+
+        if (resultados && resultados.length > 0) {
+            return {
+                id_alternativa: resultados[0].id_alternativa,
+                enunciado: resultados[0].enunciado,
+                correta: resultados[0].correta,
+                questao: {
+                    id_questao: resultados[0].questao_id_questao,
+                },
+            };
+        } else {
+            return null; // Retorna null se não encontrar
+        }
+    } catch (error) {
+        return null; // Retorna null em caso de erro
+    }
+};
+
 module.exports = {
   criarAlternativa,
   obterIdQuestaoPorEnunciado,
   obterNovoIdAlternativa,
   get,
   list,
+  editarAlternativa,
+  excluirAlternativa,
+  obterAlternativaPorId,
 };
