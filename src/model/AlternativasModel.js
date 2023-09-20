@@ -71,8 +71,9 @@ const get = () => {
   return new Promise((resolve, reject) => {
     connection.query(
       `SELECT a.id_alternativa, a.correta, a.questao_id_questao, a.enunciado
-            FROM infocimol.alternativa a
-            JOIN questao q ON a.questao_id_questao = q.id_questao;`,
+       FROM infocimol.alternativa a
+       JOIN questao q ON a.questao_id_questao = q.id_questao
+       ORDER By a.id_alternativa DESC`,
       (error, results) => {
         if (error) {
           reject(error);
@@ -121,9 +122,9 @@ const list = (data) => {
   return new Promise((resolve, reject) => {
     connection.query(
       `SELECT a.id_alternativa,a.correta, a.questao_id_questao, a.enunciado
-              FROM infocimol.alternativa a
-              JOIN questao q ON a.questao_id_questao = q.id_questao,
-              WHERE a.id_alternativa = ?;`,
+       FROM infocimol.alternativa a
+       JOIN questao q ON a.questao_id_questao = q.id_questao,
+       ORDER By a.id_alternativa DESC`,
       [id],
       (error, results) => {
         if (error) {

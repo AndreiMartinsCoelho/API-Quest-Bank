@@ -68,7 +68,7 @@ const listar = (data) => {
        FROM infocimol.prova p
        JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
        JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
-       WHERE p.id_prova = ?;`,
+       ORDER BY p.id_prova DESC`,
       [id],
       async (error, results) => {
         if (error) {
@@ -145,7 +145,8 @@ const get = () => {
       `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
         FROM infocimol.prova p
         JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
-        JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa;`,
+        JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
+        ORDER BY p.id_prova DESC`,
       async (error, results) => {
         if (error) {
           reject(error);

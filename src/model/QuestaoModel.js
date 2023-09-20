@@ -8,16 +8,18 @@ const connection = mysql.createConnection({
 });
 
 // Função para obter todas as questões
+// Função para obter todas as questões
 const get = () => {
   return new Promise((resolve, reject) => {
     connection.query(
       `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
-      a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
-      FROM infocimol.questao q
-      JOIN topico t ON q.topico_id_topico = t.id_topico
-      JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
-      JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
-      LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao;`,
+          a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
+          FROM infocimol.questao q
+          JOIN topico t ON q.topico_id_topico = t.id_topico
+          JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+          JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+          LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao
+          ORDER BY q.id_questao DESC`,
       (error, results) => {
         if (error) {
           reject(error);
@@ -40,7 +42,6 @@ const get = () => {
               alternativa_enunciado,
             } = row;
 
-            // Verifica se a questão já foi adicionada ao objeto de questoes
             if (!questoes[id_questao]) {
               questoes[id_questao] = {
                 id_questao,
@@ -61,7 +62,6 @@ const get = () => {
               };
             }
 
-            // Verifica se a alternativa existe e adiciona ao array de alternativas da questão
             if (id_alternativa) {
               questoes[id_questao].alternativas.push({
                 id_alternativa,
@@ -71,7 +71,15 @@ const get = () => {
             }
           });
 
-          // Retorna o array de questões diretamente
+          // Verificar se as questões estão sendo recuperadas corretamente
+          console.log(questoes);
+
+          // Converter o objeto em uma lista de questões
+          const listaQuestoes = Object.values(questoes);
+
+          // Ordenar a lista de questões por ID na ordem decrescente
+          listaQuestoes.sort((a, b) => b.id_questao - a.id_questao);
+
           resolve(Object.values(questoes));
         }
       }
@@ -84,14 +92,14 @@ const list = (data) => {
   const { id } = data;
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, q.tipo, q.Enunciado_imagem, q.resposta, q.nivel, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
-      a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
-      FROM infocimol.questao q
-      JOIN topico t ON q.topico_id_topico = t.id_topico
-      JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
-      JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
-      LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao
-      WHERE q.id_questao = ?;`,
+      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
+       a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
+       FROM infocimol.questao q
+       JOIN topico t ON q.topico_id_topico = t.id_topico
+       JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+       JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+       LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao
+       ORDER BY q.id_questao DESC`,
       [id],
       (error, results) => {
         if (error) {
@@ -237,12 +245,13 @@ const create = (data) => {
 const getQuestionDetails = (idQuestao) => {
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome
-           FROM questao q
-           JOIN topico t ON q.topico_id_topico = t.id_topico
-           JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
-           JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
-           WHERE q.id_questao = ?`,
+      `SELECT SQL_NO_CACHE q.id_questao
+      SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome
+      FROM questao q
+      JOIN topico t ON q.topico_id_topico = t.id_topico
+      JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+      JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+      ORDER BY q.id_questao DESC`,
       [idQuestao],
       (error, results) => {
         if (error) {
@@ -275,4 +284,4 @@ const getQuestionDetails = (idQuestao) => {
   });
 };
 
-module.exports = {get, list, create, getQuestionDetails};
+module.exports = { get, list, create, getQuestionDetails };

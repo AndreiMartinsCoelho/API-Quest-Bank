@@ -12,14 +12,18 @@ const list = (data) => {
   const { id } = data;
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT t.id_topico, t.enunciado, p.id_pessoa, p.nome AS nome_pessoa,
-        p.id_pessoa AS "usuario.id_pessoa", p.nome AS "usuario.nome_pessoa", u.perfil AS "usuario.perfil",
-        d.id_disciplina AS "Disciplina.id_disciplina", d.nome AS "Disciplina.nome_disciplina"
-        FROM infocimol.topico t
-        JOIN pessoa p ON t.professor_pessoa_id_pessoa = p.id_pessoa
-        JOIN usuario u ON p.id_pessoa = u.pessoa_id_pessoa
-        JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
-        WHERE t.id_topico = ?;`,
+      `SELECT t.id_topico, t.enunciado, 
+      p.id_pessoa, p.nome AS nome_pessoa,
+      u.id_pessoa AS "usuario.id_pessoa",
+      u.nome AS "usuario.nome_pessoa", 
+      u.perfil AS "usuario.perfil",
+      d.id_disciplina AS "disciplina.id_disciplina", 
+      d.nome AS "disciplina.nome_disciplina"
+      FROM infocimol.topico t
+      JOIN pessoa p ON t.professor_pessoa_id_pessoa = p.id_pessoa
+      JOIN usuario u ON p.id_pessoa = u.pessoa_id_pessoa
+      JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+      ORDER BY t.id_topico DESC`,
       [id],
       (error, results) => {
         if (error) {
@@ -33,9 +37,9 @@ const list = (data) => {
               nome_pessoa: topico["usuario.nome_pessoa"],
               perfil: topico["usuario.perfil"],
             },
-            Disciplina: {
-              id_disciplina: topico["Disciplina.id_disciplina"],
-              nome_disciplina: topico["Disciplina.nome_disciplina"],
+            disciplina: {
+              id_disciplina: topico["disciplina.id_disciplina"],
+              nome_disciplina: topico["disciplina.nome_disciplina"],
             },
           }));
           resolve(topicos);
@@ -118,7 +122,8 @@ const obterTodosOsTopicos = async () => {
           FROM topico t
           JOIN pessoa p ON t.professor_pessoa_id_pessoa = p.id_pessoa
           JOIN usuario u ON p.id_pessoa = u.pessoa_id_pessoa
-          JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina`,
+          JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+          ORDER BY t.id_topico DESC`,
         (error, resultados) => {
           if (error) {
             resolve(null); // Retorna null em caso de erro
@@ -172,7 +177,7 @@ const obterNovoIdTopico = async () => {
   }
 };
 
-// Função para obter o nome da pessoa pelo id do professor
+//Função para obter o nome da pessoa pelo id do professor
 const obterNomePessoa = async (idProfessor) => {
   try {
     const pessoa = await new Promise((resolve, reject) => {
@@ -194,7 +199,7 @@ const obterNomePessoa = async (idProfessor) => {
   }
 };
 
-// Função para obter o perfil do usuário pelo id do professor
+//Função para obter o perfil do usuário pelo id do professor
 const obterPerfilUsuario = async (idProfessor) => {
   try {
     const usuario = await new Promise((resolve, reject) => {
