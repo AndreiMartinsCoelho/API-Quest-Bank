@@ -29,10 +29,10 @@ app.use('/reset', reset);
 const disciplinha = require('./router/disciplina');
 app.use('/listaDisciplina', disciplinha);
 
-const listarTopico = require('./router/listarTopico');
+const listarTopico = require('./router/Topico');
 app.use('/listarTopico', listarTopico);
 
-const criarTopico = require('./router/criarTopico');
+const criarTopico = require('./router/Topico');
 app.use('/criarTopico', criarTopico);
 
 const listarAlternativas = require('./router/listarAlternativas');

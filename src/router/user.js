@@ -9,7 +9,6 @@ userRouter.post('/', async (req, res, next) => {
 });
 userRouter.post('/login', async(req, res, next)=>{
     user=await userController.login(req.body);
-    user = await userController.get(req.headers);
     res.status(200).send(user);
 })
 

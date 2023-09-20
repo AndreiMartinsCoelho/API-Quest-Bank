@@ -27,7 +27,7 @@ const get = async () => {
 // Função para realizar o login do usuário
 const login = async (data) => {
   const { email, senha } = data;
-  const md5 = require("md5")
+  const md5 = require("md5");
   return new Promise((resolve, reject) => {
     const sql =
       `SELECT p.id_pessoa as id, p.nome, p.email, ` +
@@ -139,8 +139,7 @@ const changePassword = async (data) => {
             resolve(result);
           } else {
             // Atualiza a senha do usuário no banco de dados
-            const updateSql =
-              `UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?`;
+            const updateSql = `UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?`;
             console.log(updateSql);
             connection.query(updateSql, [MD5(novaSenha), id], (error) => {
               if (error) {
@@ -163,4 +162,4 @@ const changePassword = async (data) => {
   });
 };
 
-module.exports = { get, login, verifyJWT, changePassword  };
+module.exports = { get, login, verifyJWT, changePassword };
