@@ -102,6 +102,18 @@ app.use('/listarProva', listarProva);
 const criarProva = require('./router/Prova');
 app.use('/criarProva', criarProva);
 
+//Rota para editar as provas
+const editarProva = require('./router/Prova');
+app.use('/editarProva', editarProva);
+
+//Rota para excluir as provas
+const excluirProva = require('./router/Prova');
+app.use('/excluirProva', excluirProva);
+
+//Rota para obter uma prova específica pelo seu ID
+const obterProva = require('./router/Prova');
+app.use('/obterProva', obterProva);
+
 // const config = require('./config');
 // app.use(config);
 

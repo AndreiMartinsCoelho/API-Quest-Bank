@@ -39,39 +39,118 @@ exports.listar = async (body) => {
 
 //Função para criar a prova
 exports.criar = async (body) => {
-    const result = await ProvaModel.criar(body);
-    if (result.novaProvaId) {
-      const provaCriada = result.provaDetalhes;
-      
-      const questoes = result.questoes.map((questaoId) => {
-        const questaoEncontrada = body.questoes.find(
-          (questao) => questao.id_questao === questaoId
-        );
-      
-        if (questaoEncontrada) {
-          return {
-            enunciado_questao: questaoId,
-          };
-        }else{
-          return {
-            id_questao: questaoId,
-            enunciado: "Questão não encontrada",
-          };
-        }
-      });
-      
-  
-      return {
+  const result = await ProvaModel.criar(body);
+  if (result.novaProvaId) {
+    const provaCriada = result.provaDetalhes;
+
+    const questoes = result.questoes.map((questaoId) => {
+      const questaoEncontrada = body.questoes.find(
+        (questao) => questao.id_questao === questaoId
+      );
+
+      if (questaoEncontrada) {
+        return {
+          enunciado_questao: questaoId,
+        };
+      } else {
+        return {
+          id_questao: questaoId,
+          enunciado: "Questão não encontrada",
+        };
+      }
+    });
+
+    return {
+      status: "success",
+      msg: "Prova criada com sucesso!",
+      provas: [provaCriada],
+      questoes: questoes,
+    };
+  } else {
+    // Tratar caso em que a prova não foi criada
+    return {
+      status: "error",
+      msg: "Erro ao criar a prova. Verifique os dados e tente novamente.",
+    };
+  }
+};
+
+//Função para editar a prova
+exports.editar = async (req, res) => {
+  const idProva = req.params.id;
+  const { enunciado, descricao, tipo } = req.body;
+  console.log(req.body);
+  try {
+    const success = await ProvaModel.editarProva(
+      enunciado,
+      descricao,
+      tipo,
+      idProva
+    );
+    if (success) {
+      return res.json({
         status: "success",
-        msg: "Prova criada com sucesso!",
-        provas: [provaCriada],
-        questoes: questoes,
-      };
+        msg: "Prova editada com sucesso!",
+      });
     } else {
-      // Tratar caso em que a prova não foi criada
-      return {
+      return res.status(500).json({
         status: "error",
-        msg: "Erro ao criar a prova. Verifique os dados e tente novamente.",
-      };
+        msg: "Erro ao editar a prova.",
+      });
     }
-  };
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      msg: "Erro ao editar a prova.",
+    });
+  }
+};
+
+//Função para excluir a prova
+exports.excluir = async (req, res) => {
+  const idProva = req.params.id;
+  try {
+    const success = await ProvaModel.excluirProva(idProva);
+    if (success) {
+      return res.json({
+        status: "success",
+        msg: "Prova excluída com sucesso!E todas as questões relacionadas a ela.",
+      });
+    } else {
+      return res.status(500).json({
+        status: "error",
+        msg: "Erro ao excluir a prova.",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      msg: "Erro ao excluir a prova.",
+    });
+  }
+};
+
+//Função para obter uma prova pelo id
+exports.obterProva = async (req, res) => {
+    const idProva = req.params.id;
+    try {
+        const result = await ProvaModel.obterProvaPorId(idProva);
+        if (result) {
+            return res.json({
+                status: "success",
+                msg: "Prova obtida com sucesso!",
+                prova: result,
+            });
+        }else{
+            return res.status(500).json({
+                status: "error",
+                msg: "Erro ao obter a prova.",
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            msg: "Erro ao obter a prova.",
+        });
+    }
+}

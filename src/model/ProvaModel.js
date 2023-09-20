@@ -111,7 +111,9 @@ const getQuestoes = (provaId) => {
         if (error) {
           reject(error);
         } else {
-          const questoes = results.map((questao) => questao.questao_enunciado);
+          const questoes = results.map((questao, ) => 
+            questao.questao_enunciado
+          );
           resolve(questoes);
         }
       }
@@ -175,4 +177,91 @@ const get = () => {
   });
 };
 
-module.exports = { get, criar, listar, getQuestoes, inserirQuestoes };
+//Função para editar uma prova
+const editarProva = (enunciado, descricao, tipo, idProva) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `UPDATE prova SET descricao = ?, tipo = ?, enunciado = ? WHERE id_prova = ?`,
+      [
+        descricao,
+        tipo,
+        enunciado,
+        idProva,
+      ],
+        (error, results) => {
+            if (error) {
+            reject(error);
+            } else {
+            resolve(results);
+            }
+        }
+    );
+  });
+};
+
+//Função para excluir prova
+const excluirProva = (idProva) =>{
+    return new Promise((resolve, reject) => {
+        connection.query(
+        `DELETE FROM prova WHERE id_prova = ?`,
+        [idProva],
+            (error, results) => {
+                if (error) {
+                reject(error);
+                } else {
+                resolve(results);
+                }
+            }
+        );
+    });
+}
+
+//Função para obter uma prova específico pelo seu ID
+const obterProvaPorId = async (idProva) => {
+    try {
+        const resultados = await new Promise((resolve, reject) => {
+            connection.query(
+            `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
+            FROM infocimol.prova p
+            JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
+            JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
+            WHERE p.id_prova = ?`,
+            [idProva],
+            (error, resultados) => {
+                if (error) {
+                resolve(null); // Retorna null em caso de erro
+                } else {
+                resolve(resultados);
+                }
+            }
+            );
+        });
+        const questoes = await getQuestoes(idProva);
+        const prova = resultados.map((prova) => ({
+            id_prova: prova.id_prova,
+            enunciado: prova.enunciado,
+            formato: prova.formato,
+            tipo: prova.tipo,
+            criado_por: {
+              professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
+              professor_nome: prova.professor_nome,
+            },
+            descricao: prova.descricao,
+            questoes: questoes,
+        }));
+    
+        return prova;
+    } catch (error) {
+        return null; // Retorna null em caso de erro
+    }
+};
+module.exports = {
+  get,
+  criar,
+  listar,
+  getQuestoes,
+  inserirQuestoes,
+  editarProva,
+  excluirProva,
+  obterProvaPorId,
+};
