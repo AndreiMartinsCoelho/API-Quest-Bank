@@ -21,4 +21,13 @@ TopicoRouter.post('/', async(req, res, next) => {
     res.status(200).send(result);
 });
 
+//Rota para excluir o tópico
+TopicoRouter.delete('/:id', TopicoController.excluir);
+
+//Rota para atualizar o tópico
+TopicoRouter.put('/:id', TopicoController.editar);
+
+//Rota para obter um tópico específico pelo seu ID
+TopicoRouter.get('/:id', TopicoController.listaId);
+
 module.exports = TopicoRouter;

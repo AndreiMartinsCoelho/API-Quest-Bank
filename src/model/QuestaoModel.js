@@ -8,7 +8,6 @@ const connection = mysql.createConnection({
 });
 
 // Função para obter todas as questões
-// Função para obter todas as questões
 const get = () => {
   return new Promise((resolve, reject) => {
     connection.query(

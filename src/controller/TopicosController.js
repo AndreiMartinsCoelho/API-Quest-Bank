@@ -83,3 +83,80 @@ exports.get = async () => {
     };
   }
 };
+
+//Função para excluir o tópico
+exports.excluir = async (req, res) => {
+  const idTopico = req.params.id; // Extrai o ID da URL
+  console.log(idTopico);
+  try {
+    const result = await TopicoModel.excluir(idTopico);
+    if (result.auth) {
+      return res.json({
+        status: "success",
+        msg: "Tópico excluído com sucesso! E todas as questões relacionadas a ele também foram excluídas(incluindo alternativas).",
+      });
+    } else {
+      // Tratar caso em que não há autenticação
+      return res.status(401).json({
+        status: "error",
+        msg: "Credenciais inválidas. Verifique suas credenciais e tente novamente.",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      msg: "Erro ao excluir o tópico.",
+    });
+  }
+};
+
+//Função para editar o tópico
+exports.editar = async (req, res) => {
+    const idTopico = req.params.id;
+    const enunciado = req.body.enunciado.toString();
+    try {
+        const result = await TopicoModel.editar(idTopico, enunciado);
+        if (result) {
+            return res.json({
+                status: "success",
+                msg: "Tópico editado com sucesso!",
+                topico: result,
+            });
+        } else {
+            return res.status(500).json({
+                status: "error",
+                msg: "Erro ao editar o tópico.",
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            msg: "Erro ao editar o tópico.",
+        });
+    }
+};
+
+//Função para obter um topico pelo id
+exports.listaId = async (req, res) => {
+    const idTopico = req.params.id;
+    try {
+        const result = await TopicoModel.obterTopicoPorId(idTopico);
+        if (result) {
+            return res.json({
+                status: "success",
+                msg: "Tópico obtido com sucesso!",
+                topico: result,
+            });
+        } else {
+            return res.status(500).json({
+                status: "error",
+                msg: "Erro ao obter o tópico.",
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            msg: "Erro ao obter o tópico.",
+        });
+    }
+};

@@ -42,6 +42,18 @@ app.use('/listarTopico', listarTopico);
 const criarTopico = require('./router/Topico');
 app.use('/criarTopico', criarTopico);
 
+//Rota para exluir os tópicos
+const excluirTopico = require('./router/Topico');
+app.use('/excluirTopico', excluirTopico);
+
+//Rota para editar os tópicos
+const editarTopico = require('./router/Topico');
+app.use('/editarTopico', editarTopico);
+
+//Rota para obter um tópico específico pelo seu ID
+const listaId = require('./router/Topico');
+app.use('/listaId', listaId);
+
 //Rota para listar as alternativas
 const listarAlternativas = require('./router/Alternativa');
 app.use('/listarAlternativas', listarAlternativas);
@@ -65,6 +77,8 @@ app.use('/listarProva', listarProva);
 //Rota para criar as provas
 const criarProva = require('./router/Prova');
 app.use('/criarProva', criarProva);
+
+
 
 // const config = require('./config');
 // app.use(config);

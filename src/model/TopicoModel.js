@@ -221,10 +221,106 @@ const obterPerfilUsuario = async (idProfessor) => {
   }
 };
 
+//Função para exluir topico
+const excluir = async (idTopico) => {
+  try {
+    const result = await new Promise((resolve, reject) => {
+      connection.query(
+        `DELETE FROM topico WHERE id_topico = ?`,
+        [idTopico],
+        (error) => {
+          if (error) {
+            reject(error); // Rejeita o erro em caso de falha
+          } else {
+            resolve({ auth: true });
+          }
+        }
+      );
+    });
+
+    return result; // Retorna o resultado da query (deve ser true se excluído com sucesso)
+  } catch (error) {
+    throw error; // Lança o erro para ser capturado no bloco catch
+  }
+};
+
+//Função para editar topico
+const editar = async (idTopico, enunciado) => {
+  try {
+    await new Promise((resolve, reject) => {
+      connection.query(
+        `UPDATE topico SET enunciado = ? WHERE id_topico = ?`,
+        [enunciado, idTopico],
+        (error) => {
+          if (error) {
+            reject(error); // Rejeita o erro em caso de falha
+          } else {
+            resolve();
+          }
+        }
+      );
+    });
+
+    return {
+      id_topico: idTopico,
+      enunciado,
+    };
+  } catch (error) {
+    throw error; // Lança o erro para ser capturado no bloco catch
+  }
+};
+
+// Função para obter um tópico específico pelo seu ID
+const obterTopicoPorId = async (idTopico) => {
+  try {
+    const resultados = await new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT t.id_topico, t.enunciado, p.id_pessoa, p.nome AS nome_pessoa,
+            p.id_pessoa AS "usuario.id_pessoa", p.nome AS "usuario.nome_pessoa", u.perfil AS "usuario.perfil",
+            d.id_disciplina AS "disciplina.id_disciplina", d.nome AS "disciplina.nome_disciplina"
+            FROM topico t
+            JOIN pessoa p ON t.professor_pessoa_id_pessoa = p.id_pessoa
+            JOIN usuario u ON p.id_pessoa = u.pessoa_id_pessoa
+            JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+            WHERE t.id_topico = ?`,
+        [idTopico],
+        (error, resultados) => {
+          if (error) {
+            resolve(null); // Retorna null em caso de erro
+          } else {
+            resolve(resultados);
+          }
+        }
+      );
+    });
+
+    const topico = resultados.map((topico) => ({
+      id_topico: topico.id_topico,
+      enunciado: topico.enunciado,
+      usuario: {
+        id_pessoa: topico["usuario.id_pessoa"],
+        nome_pessoa: topico["usuario.nome_pessoa"],
+        perfil: topico["usuario.perfil"],
+      },
+      disciplina: {
+        id_disciplina: topico["disciplina.id_disciplina"],
+        nome_disciplina: topico["disciplina.nome_disciplina"],
+      },
+    }));
+
+    return topico[0];
+  } catch (error) {
+    return null; // Retorna null em caso de erro
+  }
+};
+
 module.exports = {
   list,
   criarTopico,
   obterIdDisciplinaPorNome,
   obterTodosOsTopicos,
   obterNovoIdTopico,
+  excluir,
+  editar,
+  obterTopicoPorId
 };
