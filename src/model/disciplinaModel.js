@@ -23,7 +23,7 @@ const get = () => {
   });
 };
 
-// Função para listar disciplinas
+//Função para listar disciplinas
 const list = (data) => {
   const { id } = data;
   return new Promise((resolve, reject) => {
@@ -41,4 +41,21 @@ const list = (data) => {
   });
 };
 
-module.exports = { get, list};
+//Função para obter disciplina por id
+const getById = (id) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      "SELECT id_disciplina, nome FROM `infocimol`.`disciplina` WHERE id_disciplina = ?;",
+      [id],
+      (error, rows) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(rows[0]);
+        }
+      }
+    );
+  });
+};
+
+module.exports = { get, list, getById};

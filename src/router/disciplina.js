@@ -14,4 +14,10 @@ disciplinaRouter.get('/disciplina/listar', async(req, res, next)=>{
     res.status(200).send(user);
 })
 
+//Função para obter disciplina por id
+disciplinaRouter.get('/disciplina/listar/:id', async(req, res, next)=>{
+    user = await disciplinaController.getById(req.params);
+    res.status(200).send(user);
+})
+
 module.exports = disciplinaRouter;

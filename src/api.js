@@ -39,6 +39,10 @@ app.use('/login', login);
 const disciplinha = require('./router/disciplina');
 app.use('/disciplina/listar', disciplinha);
 
+//Rota para as disciplinas
+const routerDisciplina = require('./router/disciplina');
+app.use(routerDisciplina);
+
 //-----------------------Rotas de topico-----------------------//
 
 const routerTopico = require('./router/Topico');
