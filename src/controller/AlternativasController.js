@@ -6,15 +6,15 @@ exports.get = async (headers) => {
     const alternativas = await AlternativasModel.get();
     return {
       status: "success",
-      msg: "Alternativas obtidas com sucesso!",
+      msg: "Alternativas obtidas com sucesso...",
       alternativas,
     };
   } catch (error) {
     // Tratar erro caso ocorra na consulta ao banco de dados
-    console.error("Erro ao obter alternativas:", error);
+    console.error("Erro ao obter alternativas...", error);
     return {
       status: "error",
-      msg: "Ocorreu um erro ao obter as alternativas. Por favor, tente novamente mais tarde.",
+      msg: "Ocorreu algum erro ao obter as alternativas...",
     };
   }
 };
@@ -25,14 +25,14 @@ exports.listar = async (body) => {
   if (result.auth) {
     return {
       status: "success",
-      msg: "Alternativas listadas com sucesso!",
+      msg: "Alternativas obtidas com sucesso...",
       alternativas: result.alternativas,
     };
   } else {
     // Tratar caso em que não há autenticação
     return {
       status: "error",
-      msg: "Credenciais inválidas. Verifique suas credenciais e tente novamente.",
+      msg: "Ops! Você não está autenticado...",
     };
   }
 };
@@ -45,7 +45,7 @@ exports.criar = async (data) => {
     if (!enunciado || !enunciadoQuestao || !correta) {
       return {
         status: "error",
-        msg: "Por favor, forneça o enunciado da alternativa, o enunciado da questão e se a alternativa é correta no corpo da requisição.",
+        msg: "Por favor, preencha todos os campos corretamente...",
       };
     }
 
@@ -56,7 +56,7 @@ exports.criar = async (data) => {
     if (!questaoId) {
       return {
         status: "error",
-        msg: "Questão não encontrada com o enunciado fornecido.",
+        msg: "Por favor, preencha todos os campos corretamente...",
       };
     }
 
@@ -68,14 +68,14 @@ exports.criar = async (data) => {
 
     return {
       status: "success",
-      msg: "Alternativa criada com sucesso!",
+      msg: "Alternativa adicionada com sucesso...",
       alternativa: newAlternative,
     };
   } catch (error) {
-    console.error("Erro ao criar alternativa:", error);
+    console.error("Erro ao adicionar alternativa...", error);
     return {
       status: "error",
-      msg: "Ocorreu um erro ao criar a alternativa. Por favor, tente novamente mais tarde.",
+      msg: "Ops! Ocorreu algum erro ao adicionar a alternativa...",
     };
   }
 };
@@ -89,18 +89,19 @@ exports.editar = async (req, res) => {
         if (success) {
             return res.json({
                 status: "success",
-                msg: "Alternativa editada com sucesso!"
+                msg: "Alternativa atualizada com sucesso...",
+                alternativa: success
             });
         } else {
             return res.status(500).json({
                 status: "error",
-                msg: "Erro ao editar a alternativa. Por favor, tente novamente."
+                msg: "Ops! Ocorreu algum erro ao atualizar a alternativa..."
             });
         }
     } catch (error) {
         return res.status(500).json({
             status: "error",
-            msg: "Erro ao editar a alternativa. Por favor, tente novamente."
+            msg: "Ops! Ocorreu algum erro ao atualizar a alternativa..."
         });
     }
 }
@@ -113,18 +114,18 @@ exports.excluir = async (req, res) => {
         if (success) {
             return res.json({
                 status: "success",
-                msg: "Alternativa excluída com sucesso!"
+                msg: "Alternativa deletada com sucesso..."
             });
         } else {
             return res.status(500).json({
                 status: "error",
-                msg: "Erro ao excluir a alternativa. Por favor, tente novamente."
+                msg: "Ops! Ocorreu algum erro ao deletar a alternativa..."
             });
         }
     } catch (error) {
         return res.status(500).json({
             status: "error",
-            msg: "Erro ao excluir a alternativa. Por favor, tente novamente."
+            msg: "Ops! Ocorreu algum erro ao deletar a alternativa..."
         });
     }
 }
@@ -137,19 +138,19 @@ exports.obterAlternativa = async (req, res) => {
         if (result) {
             return res.json({
                 status: "success",
-                msg: "Alternativa obtida com sucesso!",
+                msg: "Alternativa obtida com sucesso...",
                 alternativa: result,
             });
         } else {
             return res.status(500).json({
                 status: "error",
-                msg: "Erro ao obter a alternativa. Por favor, tente novamente."
+                msg: "Ops! Ocorreu algum erro ao obter a alternativa..."
             });
         }
     } catch (error) {
         return res.status(500).json({
             status: "error",
-            msg: "Erro ao obter a alternativa. Por favor, tente novamente."
+            msg: "Ops! Ocorreu algum erro ao obter a alternativa..."
         });
     }
 }
