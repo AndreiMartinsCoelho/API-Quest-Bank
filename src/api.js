@@ -48,23 +48,11 @@ app.use(routerTopico);
 
 //Rota para listar as alternativas
 const listarAlternativas = require('./router/Alternativa');
-app.use('/listarAlternativas', listarAlternativas);
+app.use('/alternativa/listar', listarAlternativas);
 
-//Rota para criar as alternativas
-const criarAlternativas = require('./router/Alternativa');
-app.use('/criarAlternativas', criarAlternativas);
-
-//Rota para editar as alternativas
-const editarAlternativas = require('./router/Alternativa');
-app.use('/editarAlternativas', editarAlternativas);
-
-//Rota para excluir as alternativas
-const excluirAlternativas = require('./router/Alternativa');
-app.use('/excluirAlternativas', excluirAlternativas);
-
-//Rota para obter uma alternativa específica pelo seu ID
-const obterAlternativa = require('./router/Alternativa');
-app.use('/verAlternativa', obterAlternativa);
+//Rota para as alternativas
+const routerAlternativa = require('./router/Alternativa');
+app.use(routerAlternativa);
 
 //-----------------------Rotas de questão-----------------------//
 
@@ -80,23 +68,11 @@ app.use(routerQuestao);
 
 //Rota para listar as provas
 const listarProva = require('./router/Prova');
-app.use('/listarProva', listarProva);
+app.use('/prova/listar', listarProva);
 
-//Rota para criar as provas
-const criarProva = require('./router/Prova');
-app.use('/criarProva', criarProva);
-
-//Rota para editar as provas
-const editarProva = require('./router/Prova');
-app.use('/editarProva', editarProva);
-
-//Rota para excluir as provas
-const excluirProva = require('./router/Prova');
-app.use('/excluirProva', excluirProva);
-
-//Rota para obter uma prova específica pelo seu ID
-const obterProva = require('./router/Prova');
-app.use('/obterProva', obterProva);
+//Rota para as provas
+const routerProva = require('./router/Prova');
+app.use(routerProva);
 
 // const config = require('./config');
 // app.use(config);
