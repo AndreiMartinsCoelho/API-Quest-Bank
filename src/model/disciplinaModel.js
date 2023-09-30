@@ -12,11 +12,11 @@ const get = () => {
   return new Promise((resolve, reject) => {
     connection.query(
       "SELECT id_disciplina, nome FROM `infocimol`.`disciplina`;",
-      (error, results) => {
+      (error, rows) => {
         if (error) {
           reject(error);
         } else {
-          resolve(results);
+          resolve(rows);
         }
       }
     );
@@ -28,17 +28,17 @@ const list = (data) => {
   const { id } = data;
   return new Promise((resolve, reject) => {
     connection.query(
-      "SELECT id_disciplina, nome FROM `infocimol`.`disciplina` WHERE id_disciplina = ?;",
+      "SELECT id_disciplina, nome FROM `infocimol`.`disciplina` WHERE ORDER BY id_disciplina DESC = ?;",
       [id],
-      (error, results) => {
+      (error, rows) => {
         if (error) {
           reject(error);
         } else {
-          resolve(results);
+          resolve(rows);
         }
       }
     );
   });
 };
 
-module.exports = { get, list };
+module.exports = { get, list};

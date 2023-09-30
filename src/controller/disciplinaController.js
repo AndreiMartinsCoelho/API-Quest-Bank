@@ -12,7 +12,7 @@ exports.get = async (headers) => {
 };
 
 exports.listar = async (body) => {
-    const result = await disciplinaModel.listar(body);
+    const result = await disciplinaModel.list(body);
     if (result.auth) {
         return { status: "success", msg: "Disciplinas listadas com sucesso!", disciplinas: result.disciplinas };
     } else {

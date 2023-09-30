@@ -14,8 +14,7 @@ const list = (data) => {
     connection.query(
       `SELECT t.id_topico, t.enunciado, 
       p.id_pessoa, p.nome AS nome_pessoa,
-      u.id_pessoa AS "usuario.id_pessoa",
-      u.nome AS "usuario.nome_pessoa", 
+      u.pessoa_id_pessoa AS "usuario.id_pessoa", 
       u.perfil AS "usuario.perfil",
       d.id_disciplina AS "disciplina.id_disciplina", 
       d.nome AS "disciplina.nome_disciplina"
@@ -34,7 +33,6 @@ const list = (data) => {
             enunciado: topico.enunciado,
             usuario: {
               id_pessoa: topico["usuario.id_pessoa"],
-              nome_pessoa: topico["usuario.nome_pessoa"],
               perfil: topico["usuario.perfil"],
             },
             disciplina: {
@@ -117,7 +115,7 @@ const obterTodosOsTopicos = async () => {
     const resultados = await new Promise((resolve, reject) => {
       connection.query(
         `SELECT t.id_topico, t.enunciado, p.id_pessoa, p.nome AS nome_pessoa,
-          p.id_pessoa AS "usuario.id_pessoa", p.nome AS "usuario.nome_pessoa", u.perfil AS "usuario.perfil",
+          p.id_pessoa AS "usuario.pesosa_id_pessoa", u.perfil AS "usuario.perfil",
           d.id_disciplina AS "disciplina.id_disciplina", d.nome AS "disciplina.nome_disciplina"
           FROM topico t
           JOIN pessoa p ON t.professor_pessoa_id_pessoa = p.id_pessoa
@@ -139,7 +137,6 @@ const obterTodosOsTopicos = async () => {
       enunciado: topico.enunciado,
       usuario: {
         id_pessoa: topico["usuario.id_pessoa"],
-        nome_pessoa: topico["usuario.nome_pessoa"],
         perfil: topico["usuario.perfil"],
       },
       disciplina: {

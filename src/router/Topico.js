@@ -9,25 +9,25 @@ TopicoRouter.get('/', async (req, res, next) => {
 });
 
 //Rota para listar o tópico
-TopicoRouter.get('/', async(req, res, next)=>{
-    user=await TopicoController.listar(req.body);
+TopicoRouter.get('/topico/listar', async(req, res, next)=>{
+    user=await TopicoController.get(req.body);
     res.status(200).send(user);
 })
 
 //Rota para criar o tópico
-TopicoRouter.post('/', async(req, res, next) => {
+TopicoRouter.post('/topico/adicionar', async(req, res, next) => {
     const data = req.body;
     const result = await TopicoController.criar(data);
     res.status(200).send(result);
 });
 
 //Rota para excluir o tópico
-TopicoRouter.delete('/:id', TopicoController.excluir);
+TopicoRouter.delete('/topico/deletar/:id', TopicoController.excluir);
 
 //Rota para atualizar o tópico
-TopicoRouter.put('/:id', TopicoController.editar);
+TopicoRouter.put('/topico/atualizar/:id', TopicoController.editar);
 
 //Rota para obter um tópico específico pelo seu ID
-TopicoRouter.get('/:id', TopicoController.listaId);
+TopicoRouter.get('/topico/listar/:id', TopicoController.listaId);
 
 module.exports = TopicoRouter;

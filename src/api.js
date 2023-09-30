@@ -14,51 +14,35 @@ const {
     DB_PORT
 } = require('./config');
 
+
+//--------------Rotas principais----------------//
+const userRouter = require('./router/user');
+app.use(userRouter);
+
 //rota principal da API
 const router = require('./router/route');
 app.use(router);
 
 //--------------Rotas de usuário----------------//
 
-//eota para o usuário
+//Rota para o usuário
 const userRoute = require("./router/user");
 app.use('/user', userRoute);
 
-//rota para o usuario 2.0
+//Rota para o login do usuário
 const login = require('./router/user');
 app.use('/login', login);
-
-//rota para resetar senha do usuario
-const reset = require('./router/user');
-app.use('/reset', reset);
 
 //-----------------------Rotas de disciplina-----------------------//
 
 //Rota para listar as disciplinas
 const disciplinha = require('./router/disciplina');
-app.use('/listaDisciplina', disciplinha);
+app.use('/disciplina/listar', disciplinha);
 
 //-----------------------Rotas de topico-----------------------//
 
-//Rota para listar os tópicos
-const listarTopico = require('./router/Topico');
-app.use('/listarTopico', listarTopico);
-
-//Rota para criar os tópicos
-const criarTopico = require('./router/Topico');
-app.use('/criarTopico', criarTopico);
-
-//Rota para exluir os tópicos
-const excluirTopico = require('./router/Topico');
-app.use('/excluirTopico', excluirTopico);
-
-//Rota para editar os tópicos
-const editarTopico = require('./router/Topico');
-app.use('/editarTopico', editarTopico);
-
-//Rota para obter um tópico específico pelo seu ID
-const listaId = require('./router/Topico');
-app.use('/listaId', listaId);
+const routerTopico = require('./router/Topico');
+app.use(routerTopico);
 
 //-----------------------Rotas de alternativa-----------------------//
 
@@ -86,23 +70,11 @@ app.use('/verAlternativa', obterAlternativa);
 
 //Rota para listar as questões
 const listarQuestao = require('./router/Questao');
-app.use('/listarQuestao', listarQuestao);
+app.use('/questao/listar', listarQuestao);
 
-//Rota para criar as questões
-const criarQuestao = require('./router/Questao');
-app.use('/criarQuestao', criarQuestao);
-
-//Rota para editar as questões
-const editarQuestao = require('./router/Questao');
-app.use('/editarQuestao', editarQuestao);
-
-//Rota para excluir as questões
-const excluirQuestao = require('./router/Questao');
-app.use('/excluirQuestao', excluirQuestao);
-
-//Rota para obter uma questão específica pelo seu ID
-const obterQuestao = require('./router/Questao');
-app.use('/obterQuestao', obterQuestao);
+//Rota para as questões
+const routerQuestao = require('./router/Questao');
+app.use(routerQuestao);
 
 //-------------Rotas de prova----------------//
 

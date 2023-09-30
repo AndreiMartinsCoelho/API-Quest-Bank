@@ -13,7 +13,7 @@ userRouter.post('/login', async(req, res, next)=>{
 })
 
 //Funçãp para trocar a senha do usuário
-userRouter.put("/", async (req, res, next) => {
+userRouter.put("/user/esqueceuSenha", async (req, res, next) => {
     const result = await userController.changePassword(req.body);
     res.status(200).send(result);
 });
