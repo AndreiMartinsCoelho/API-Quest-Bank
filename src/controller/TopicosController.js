@@ -55,8 +55,8 @@ exports.criar = async (data) => {
 //Função para obter todos os tópicos
 exports.get = async () => {
   try {
-    const topics = await TopicoModel.obterTodosOsTopicos();
-    return { status: "success", msg: "Tópicos obtidos com sucesso!", topics };
+    const topicos = await TopicoModel.obterTodosOsTopicos();
+    return { status: "success", msg: "Tópicos obtidos com sucesso!", topicos };
   } catch (error) {
     console.error("Erro ao pegar os tópicos:", error);
     return {

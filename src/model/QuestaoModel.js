@@ -4,14 +4,15 @@ const connection = require("./mysqlConnect").query();
 const get = () => {
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
+      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, t.disciplina_id_disciplina, d.nome AS disciplina_nome, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
           a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
           FROM infocimol.questao q
           JOIN topico t ON q.topico_id_topico = t.id_topico
+          JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
           JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
           JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
           LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao
-          ORDER BY q.id_questao DESC`,
+          ORDER BY q.id_questao ASC`,
       (error, results) => {
         if (error) {
           reject(error);
@@ -29,6 +30,8 @@ const get = () => {
               professor_pessoa_id_pessoa,
               topico_id_topico,
               topico_enunciado,
+              disciplina_id_disciplina,
+              disciplina_nome,
               id_alternativa,
               correta,
               alternativa_enunciado,
@@ -49,6 +52,10 @@ const get = () => {
                 topico: {
                   topico_id_topico,
                   topico_enunciado,
+                  disciplina: {
+                    disciplina_id_disciplina,
+                    disciplina_nome,
+                  },
                 },
                 alternativas: [],
               };
@@ -63,93 +70,14 @@ const get = () => {
             }
           });
 
-          // Verificar se as questões estão sendo recuperadas corretamente
-          console.log(questoes);
-
-          // Converter o objeto em uma lista de questões
+          //Ordena as questões por ID de forma decrescente (da mais nova para a mais antiga) e resolve a Promise com o array de questões          
           const listaQuestoes = Object.values(questoes);
-
-          // Ordenar a lista de questões por ID na ordem decrescente
           listaQuestoes.sort((a, b) => b.id_questao - a.id_questao);
-
-          resolve(Object.values(questoes));
+          resolve(Object.values(listaQuestoes));
         }
       }
     );
-  });
-};
-
-// Função para obter uma questão específica pelo seu ID
-const list = (data) => {
-  const { id } = data;
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
-       a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
-       FROM infocimol.questao q
-       JOIN topico t ON q.topico_id_topico = t.id_topico
-       JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
-       JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
-       LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao
-       ORDER BY q.id_questao DESC`,
-      [id],
-      (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          let questao = {};
-          results.forEach((row) => {
-            const {
-              id_questao,
-              enunciado,
-              Enunciado_imagem,
-              tipo,
-              nivel,
-              resposta,
-              professor_nome,
-              professor_pessoa_id_pessoa,
-              topico_id_topico,
-              topico_enunciado,
-              id_alternativa,
-              correta,
-              alternativa_enunciado,
-            } = row;
-
-            // Verifica se a questão já foi adicionada ao objeto de questao
-            if (!questao.id_questao) {
-              questao.id_questao = id_questao;
-              questao.enunciado = enunciado;
-              questao.Enunciado_imagem = Enunciado_imagem;
-              questao.tipo = tipo;
-              questao.nivel = nivel;
-              questao.resposta = resposta;
-              questao.professor = {
-                professor_id_professor: professor_pessoa_id_pessoa,
-                professor_nome,
-              };
-              questao.topico = {
-                topico_id_topico,
-                topico_enunciado,
-              };
-              questao.alternativas = [];
-            }
-
-            // Verifica se a alternativa existe e adiciona ao array de alternativas da questão
-            if (id_alternativa) {
-              questao.alternativas.push({
-                id_alternativa,
-                correta,
-                enunciado: alternativa_enunciado,
-              });
-            }
-          });
-
-          // Retorna a questão diretamente
-          resolve(questao);
-        }
-      }
-    );
-  });
+  })
 };
 
 // Função para criar uma nova questão
@@ -237,11 +165,12 @@ const create = (data) => {
 const getQuestionDetails = (idQuestao) => {
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome
+      `SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome, d.id_disciplina, d.nome as nome
         FROM questao q
         JOIN topico t ON q.topico_id_topico = t.id_topico
         JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
         JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+        JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
         WHERE q.id_questao = ?`,
       [idQuestao],
       (error, results) => {
@@ -262,8 +191,12 @@ const getQuestionDetails = (idQuestao) => {
               },
               topico: {
                 topico_id_topico: results[0].id_topico,
-                topico_enunciado: results[0].topico,
+                topico_enunciado: results[0].topico
               },
+              disciplina: {
+                disciplina_id_disciplina: results[0].id_disciplina,
+                disciplina_nome: results[0].nome
+              }
             };
             resolve(detalhesQuestao);
           } else {
@@ -298,7 +231,8 @@ const editarQuestao = async (
         }
       );
     });
-    return resultados;
+    const updatedQuestion = await getQuestionDetails(idQuestao);
+    return updatedQuestion;
   } catch (error) {
     throw error;
   }
@@ -320,7 +254,38 @@ const excluirQuestao = async (idQuestao) => {
         }
       );
     });
-    return resultados;
+    if (resultados.affectedRows > 0) {
+      return resultados;
+    } else {
+      throw new Error("Questão não encontrada");
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Função para obter todas as alternativas de uma questão
+const getAlternativas = async (idQuestao) => {
+  try {
+    const resultados = await new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT * FROM alternativa WHERE questao_id_questao = ?`,
+        [idQuestao],
+        (error, resultados) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(resultados);
+          }
+        }
+      );
+    });
+    const alternativas = resultados.map((alternativa) => ({
+      id_alternativa: alternativa.id_alternativa,
+      enunciado: alternativa.enunciado,
+      correta: alternativa.correta,
+    }));
+    return alternativas;
   } catch (error) {
     throw error;
   }
@@ -328,53 +293,60 @@ const excluirQuestao = async (idQuestao) => {
 
 //Função para obter uma questao específico pelo seu ID
 const verQuestao = async (idQuestao) => {
-    try {
-        const resultados = await new Promise((resolve, reject) => {
-            connection.query(
-                `SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome
-                FROM questao q
-                JOIN topico t ON q.topico_id_topico = t.id_topico
-                JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
-                JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
-                WHERE q.id_questao = ?`,
-                [idQuestao],
-                (error, resultados) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(resultados);
-                    }
-                }
-            );
-        });
-        const questao = resultados.map((questao) => ({
-            id_questao: questao.id_questao,
-            enunciado: questao.enunciado,
-            Enunciado_imagem: questao.Enunciado_imagem,
-            tipo: questao.tipo,
-            nivel: questao.nivel,
-            resposta: questao.resposta,
-            professor: {
-                professor_id_professor: questao.professor_pessoa_id_pessoa,
-                professor_nome: questao.professor_nome,
-            },
-            topico: {
-                topico_id_topico: questao.id_topico,
-                topico_enunciado: questao.topico,
-            },
-        }));
-        return questao[0];
-    } catch (error) {
-        return null; // Retorna null em caso de erro
-    }
-}
+  try {
+    const resultados = await new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome, d.id_disciplina, d.nome as nome
+        FROM questao q
+        JOIN topico t ON q.topico_id_topico = t.id_topico
+        JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+        JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+        JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+        WHERE q.id_questao = ?`,
+        [idQuestao],
+        (error, resultados) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(resultados);
+          }
+        }
+      );
+    });
+    const questao = resultados.map(async (questao) => ({
+      id_questao: questao.id_questao,
+      enunciado: questao.enunciado,
+      enunciado_imagem: questao.Enunciado_imagem,
+      tipo: questao.tipo,
+      nivel: questao.nivel,
+      resposta: questao.resposta,
+      professor: {
+        id_professor: questao.professor_pessoa_id_pessoa,
+        nome: questao.professor_nome,
+      },
+      topico: {
+        id_topico: questao.id_topico,
+        enunciado: questao.topico,
+        disciplina: {
+          id_disciplina: questao.id_disciplina,
+          nome: questao.nome,
+        },
+      },
+      alternativas: await getAlternativas(questao.id_questao),
+    }));
+    console.log(questao);
+    return questao[0];
+  } catch (error) {
+    return null;
+  }
+};
 
 module.exports = {
   get,
-  list,
   create,
   getQuestionDetails,
   editarQuestao,
   excluirQuestao,
   verQuestao,
+  getAlternativas,
 };

@@ -6,33 +6,33 @@ exports.get = async (headers) => {
         const questoes = await QuestaoModel.get();
         return {
         status: "success",
-        msg: "Questões obtidas com sucesso!",
+        msg: "Questões obtidas com sucesso...",
         questoes,
         };
     } catch (error) {
         // Tratar erro caso ocorra na consulta ao banco de dados
-        console.error("Erro ao obter questões:", error);
+        console.error("Erro ao listar as questões:", error);
         return {
         status: "error",
-        msg: "Ocorreu um erro ao obter as questões. Por favor, tente novamente mais tarde.",
+        msg: "Ops! ocorreu um erro fatal ao listar as questões...",
         };
     }
 };
 
 //Função para listar as questões
 exports.listar = async (body) => {
-    const result = await QuestaoModel.list(body);
+    const result = await QuestaoModel.get(body);
     if (result.auth) {
         return {
         status: "success",
-        msg: "Questões listadas com sucesso!",
+        msg: "Questões listadas com sucesso em ordem inversa...",
         questoes: result.questoes,
         };
     } else {
         // Tratar caso em que não há autenticação
         return {
         status: "error",
-        msg: "Credenciais inválidas. Verifique suas credenciais e tente novamente.",
+        msg: "Ops! ocorreu um erro de login...",
         };
     }
 };
@@ -45,14 +45,14 @@ exports.criar = async (body) => {
   
       return {
         status: 200,
-        msg: "Questão criada com sucesso!",
+        msg: "Questão adicionada com sucesso...",
         resp: [questionDetails],
       };
     } catch (error) {
-      console.error("Erro ao criar a questão:", error);
+      console.error("Erro ao adicionar a questão:", error);
       return {
         status: "error",
-        msg: "Ocorreu um erro ao criar a questão. Por favor, tente novamente.",
+        msg: "Ops! ocorreu um erro fatal ao adicionar a questão...",
       };
     }
 };
@@ -62,22 +62,23 @@ exports.editar = async (req, res) => {
     const idQuestao = req.params.id;
     const { tipo, nivel, enunciado, Enunciado_imagem, resposta } = req.body;
     try {
-        const success = await QuestaoModel.editarQuestao(tipo, nivel, enunciado, Enunciado_imagem, resposta, idQuestao);
-        if (success) {
+        const updatedQuestion = await QuestaoModel.editarQuestao(tipo, nivel, enunciado, Enunciado_imagem, resposta, idQuestao);
+        if (updatedQuestion) {
             return res.json({
                 status: "success",
-                msg: "Questão editada com sucesso!"
+                msg: "Questão atualizada com sucesso...",
+                data: updatedQuestion
             });
         } else {
             return res.status(500).json({
                 status: "error",
-                msg: "Erro ao editar a questão."
+                msg: "Ops! ocorreu um erro ao atualizar a questão..."
             });
         }
     } catch (error) {
         return res.status(500).json({
             status: "error",
-            msg: "Erro ao editar a questão."
+            msg: "Ops! ocorreu um erro fatal ao atualizar a questão..."
         });
     }
 }
@@ -90,18 +91,18 @@ exports.excluir = async (req, res) => {
         if (success) {
             return res.json({
                 status: "success",
-                msg: "Questão excluída com sucesso! E todas as suas alternativas também foram excluídas(Todas as alternativas que estavam relacionadas a essa questão)."
+                msg: "Questão deletada com sucesso..."
             });
         } else {
             return res.status(500).json({
                 status: "error",
-                msg: "Erro ao excluir a questão.",
+                msg: "Ops! ocorreu um erro ao deletar a questão...",
             });
         }
     } catch (error) {
         return res.status(500).json({
             status: "error",
-            msg: "Erro ao excluir a questão.",
+            msg: "Ops! ocorreu um erro fatal ao deletar a questão...",
         });
     }
 };
@@ -114,19 +115,19 @@ exports.obterQuestao = async (req, res) => {
         if (result) {
             return res.json({
                 status: "success",
-                msg: "Questão obtida com sucesso!",
+                msg: "Questão obtida com sucesso...",
                 questao: result
             });
         } else {
             return res.status(500).json({
                 status: "error",
-                msg: "Erro ao obter a questão.",
+                msg: "Ops! ocorreu um erro ao obter a questão...",
             });
         }
     } catch (error) {
         return res.status(500).json({
             status: "error",
-            msg: "Erro ao obter a questão.",
+            msg: "Ops! ocorreu um erro fatal ao obter a questão...",
         });
     }
 };
