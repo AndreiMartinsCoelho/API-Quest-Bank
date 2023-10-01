@@ -105,27 +105,53 @@ const getQuestoes = (provaId) => {
       JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
       WHERE qp.prova_id_prova = ?;`,
       [provaId],
+      async (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          const questoes = await Promise.all(results.map(async (questao) => {
+            const alternativas = await getAlternativas(questao.questao_id);
+            return {
+              questao_id: questao.questao_id,
+              questao_enunciado: questao.questao_enunciado,
+              questao_tipo: questao.questao_tipo,
+              questao_nivel: questao.questao_nivel,
+              questao_enunciado_imagem: questao.questao_enunciado_imagem,
+              questao_resposta: questao.questao_resposta,
+              topicos:{
+                questao_topico_id_topico: questao.questao_topico_id_topico,
+                questao_topico_enunciado: questao.questao_topico_enunciado,
+                disciplina:{
+                  questao_topico_disciplina_id_disciplina: questao.questao_topico_disciplina_id_disciplina,
+                  questao_topico_disciplina_nome: questao.questao_topico_disciplina_nome,
+                }
+              },
+              alternativas: alternativas,
+            };
+          }));
+          resolve(questoes);
+        }
+      }
+    );
+  });
+};
+
+//Função para obter as alternativas de uma questão
+const getAlternativas = (questaoId) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `SELECT id_alternativa, enunciado, correta FROM alternativa WHERE questao_id_questao = ?`,
+      [questaoId],
       (error, results) => {
         if (error) {
           reject(error);
         } else {
-          const questoes = results.map((questao) => ({
-            questao_id: questao.questao_id,
-            questao_enunciado: questao.questao_enunciado,
-            questao_tipo: questao.questao_tipo,
-            questao_nivel: questao.questao_nivel,
-            questao_enunciado_imagem: questao.questao_enunciado_imagem,
-            questao_resposta: questao.questao_resposta,
-            topicos:{
-              questao_topico_id_topico: questao.questao_topico_id_topico,
-              questao_topico_enunciado: questao.questao_topico_enunciado,
-              disciplina:{
-                questao_topico_disciplina_id_disciplina: questao.questao_topico_disciplina_id_disciplina,
-                questao_topico_disciplina_nome: questao.questao_topico_disciplina_nome,
-              }
-            }
+          const alternativas = results.map((alternativa) => ({
+            id_alternativa: alternativa.id_alternativa,
+            enunciado: alternativa.enunciado,
+            correta: alternativa.correta,
           }));
-          resolve(questoes);
+          resolve(alternativas);
         }
       }
     );
@@ -221,7 +247,7 @@ const editarProva = (enunciado, descricao, tipo, idProva) => {
                   tipo: tipo,
                   criado_por: prova.professor_pessoa_id_pessoa,
                   descricao: descricao,
-                  questoes: questoes,
+                  questoes: questoes
                 });
               }
             }
@@ -299,6 +325,7 @@ const obterProvaPorId = async (idProva) => {
         return null; // Retorna null em caso de erro
     }
 };
+
 module.exports = {
   get,
   criar,
@@ -308,4 +335,5 @@ module.exports = {
   editarProva,
   excluirProva,
   obterProvaPorId,
+  getAlternativas
 };

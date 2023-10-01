@@ -141,7 +141,7 @@ exports.obterProva = async (req, res) => {
                 msg: "Prova listada com sucesso...",
                 prova: result,
             });
-        }else{
+        } else {
             return res.status(500).json({
                 status: "error",
                 msg: "Ops! Ocorreu um erro ao listar a prova...",
@@ -153,4 +153,4 @@ exports.obterProva = async (req, res) => {
             msg: "Ops! Ocorreu um erro fatal ao listar a prova..",
         });
     }
-}
+};
