@@ -6,7 +6,7 @@ exports.get = async (headers) => {
     const provas = await ProvaModel.get();
     return {
       status: "success",
-      msg: "Provas obtidas com sucesso!",
+      msg: "Provas obtidas com sucesso...",
       provas,
     };
   } catch (error) {
@@ -14,7 +14,7 @@ exports.get = async (headers) => {
     console.error("Erro ao obter Provas:", error);
     return {
       status: "error",
-      msg: "Ocorreu um erro ao obter as Provas. Por favor, tente novamente mais tarde.",
+      msg: "Ops! Ocorreu um erro ao obter as provas...",
     };
   }
 };
@@ -25,14 +25,14 @@ exports.listar = async (body) => {
   if (result.auth) {
     return {
       status: "success",
-      msg: "Provas listadas com sucesso!",
+      msg: "Provas listadas com sucesso...",
       provas: result.provas,
     };
   } else {
     // Tratar caso em que não há autenticação
     return {
       status: "error",
-      msg: "Credenciais inválidas. Verifique suas credenciais e tente novamente.",
+      msg: "Ops! Ocorreu algum erro...",
     };
   }
 };
@@ -54,15 +54,14 @@ exports.criar = async (body) => {
         };
       } else {
         return {
-          id_questao: questaoId,
-          enunciado: "Questão não encontrada",
+          questao: questaoId
         };
       }
     });
 
     return {
       status: "success",
-      msg: "Prova criada com sucesso!",
+      msg: "Prova criada com sucesso...",
       provas: [provaCriada],
       questoes: questoes,
     };
@@ -70,7 +69,7 @@ exports.criar = async (body) => {
     // Tratar caso em que a prova não foi criada
     return {
       status: "error",
-      msg: "Erro ao criar a prova. Verifique os dados e tente novamente.",
+      msg: "Ops! Ocorreu algum erro ao criar prova..."
     };
   }
 };
@@ -81,27 +80,28 @@ exports.editar = async (req, res) => {
   const { enunciado, descricao, tipo } = req.body;
   console.log(req.body);
   try {
-    const success = await ProvaModel.editarProva(
+    const prova = await ProvaModel.editarProva(
       enunciado,
       descricao,
       tipo,
       idProva
     );
-    if (success) {
+    if (prova) {
       return res.json({
         status: "success",
-        msg: "Prova editada com sucesso!",
+        msg: "Prova atualizada com sucesso...",
+        prova: prova,
       });
     } else {
       return res.status(500).json({
         status: "error",
-        msg: "Erro ao editar a prova.",
+        msg: "Ops! Ocorreu um erro ao atualizar a prova...",
       });
     }
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      msg: "Erro ao editar a prova.",
+      msg: "Ops! Ocorreu um erro fatal ao atualizar a prova..",
     });
   }
 };
@@ -114,18 +114,18 @@ exports.excluir = async (req, res) => {
     if (success) {
       return res.json({
         status: "success",
-        msg: "Prova excluída com sucesso!E todas as questões relacionadas a ela.",
+        msg: "Prova deletada com sucesso...",
       });
     } else {
       return res.status(500).json({
         status: "error",
-        msg: "Erro ao excluir a prova.",
+        msg: "Ops! Ocorreu um erro ao deletar a prova...",
       });
     }
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      msg: "Erro ao excluir a prova.",
+      msg: "Ops! Ocorreu um erro fatal ao deletar a prova..",
     });
   }
 };
@@ -138,19 +138,19 @@ exports.obterProva = async (req, res) => {
         if (result) {
             return res.json({
                 status: "success",
-                msg: "Prova obtida com sucesso!",
+                msg: "Prova listada com sucesso...",
                 prova: result,
             });
         }else{
             return res.status(500).json({
                 status: "error",
-                msg: "Erro ao obter a prova.",
+                msg: "Ops! Ocorreu um erro ao listar a prova...",
             });
         }
     } catch (error) {
         return res.status(500).json({
             status: "error",
-            msg: "Erro ao obter a prova.",
+            msg: "Ops! Ocorreu um erro fatal ao listar a prova..",
         });
     }
 }
