@@ -24,54 +24,77 @@ const get = async () => {
   });
 };
 
-// Função para realizar o login do usuário
+// Função para fazer login
 const login = async (data) => {
+  const bcrypt = require("bcrypt");
   const { email, senha } = data;
-  const md5 = require("md5");
+
   return new Promise((resolve, reject) => {
     const sql =
-      `SELECT p.id_pessoa as id, p.nome, p.email, ` +
-      `(SELECT COUNT(pessoa_id_pessoa) FROM professor WHERE pessoa_id_pessoa=p.id_pessoa) as professor, ` +
-      `(SELECT COUNT(pessoa_id_pessoa) FROM administrador WHERE pessoa_id_pessoa=p.id_pessoa) as admin ` +
-      `FROM usuario u ` +
-      `JOIN pessoa p ON p.id_pessoa=u.pessoa_id_pessoa ` +
-      `WHERE p.email = ? AND u.senha = ?`;
+    `SELECT p.id_pessoa as id, p.nome, p.email, ` +
+    `(SELECT COUNT(pessoa_id_pessoa) FROM professor WHERE pessoa_id_pessoa=p.id_pessoa) as professor, ` +
+    `(SELECT COUNT(pessoa_id_pessoa) FROM administrador WHERE pessoa_id_pessoa=p.id_pessoa) as admin, ` +
+    `u.senha ` +
+    `FROM usuario u ` +
+    `JOIN pessoa p ON p.id_pessoa=u.pessoa_id_pessoa ` +
+    `WHERE p.email = ?`;
 
-    connection.query(sql, [email, md5(senha)], (error, results) => {
+    connection.query(sql, [email], async (error, results) => {
       if (error) {
         reject(error);
       } else {
-        let result = null;
         if (results && results.length > 0) {
           const id = results[0].id;
-          const token = jwt.sign({ id }, "infocimol", { expiresIn: "1h" });
+          const password = results[0].senha;
+          //console.log(password);
+          if (password) {
+            bcrypt.compare(senha, password, async (err, res) => {
+              if (err) {
+                reject(err);
+              } else if (res) {
+                const token = jwt.sign({ id }, "infocimol", { expiresIn: "1h" });
 
-          console.log("Fez login e gerou token!");
+                console.log("Fez login e gerou token!");
 
-          const perfil = [];
-          if (results[0].professor > 0) {
-            perfil.push("professor");
+                const perfil = [];
+                if (results[0].professor > 0) {
+                  perfil.push("professor");
+                }
+                if (results[0].admin > 0) {
+                  perfil.push("admin");
+                }
+
+                results[0].perfil = perfil;
+
+                const updateSql =
+                  "UPDATE usuario SET perfil = ? WHERE pessoa_id_pessoa = ?";
+
+                connection.query(updateSql, [perfil.toString(), id], (error) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    const result = { auth: true, token, user: { 
+                      id: results[0].id, 
+                      nome: results[0].nome, 
+                      email: results[0].email,
+                      professor: results[0].professor,
+                      admin: results[0].admin,
+                      perfil: perfil
+                    }};
+                    resolve(result);
+                  }
+                });
+              } else {
+                const result = { auth: false, message: "Credenciais inválidas" };
+                resolve(result);
+              }
+            });
+          } else {
+            const result = { auth: false, message: "Credenciais inválidas" };
+            resolve(result);
           }
-          if (results[0].admin > 0) {
-            perfil.push("admin");
-          }
-
-          results[0].perfil = perfil;
-
-          // Atualiza o perfil do usuário no banco de dados
-          const updateSql =
-            "UPDATE usuario SET perfil = ? WHERE pessoa_id_pessoa = ?";
-          console.log(updateSql);
-          connection.query(updateSql, [perfil.toString(), id], (error) => {
-            if (error) {
-              reject(error);
-            } else {
-              result = { auth: true, token, user: results[0] };
-              resolve(result);
-            }
-          });
         } else {
-          result = { auth: false, message: "Credenciais inválidas" };
+          const result = { auth: false, message: "Credenciais inválidas" };
           resolve(result);
         }
       }
@@ -110,8 +133,8 @@ const verifyJWT = async (token, perfil) => {
 
 // Função para trocar a senha do usuário
 const changePassword = async (data) => {
+  const bcrypt = require("bcrypt");
   const { email, novaSenha, confirmSenha } = data;
-  const MD5 = require("md5");
   return new Promise((resolve, reject) => {
     const sql =
       "SELECT p.id_pessoa as id, p.nome, p.email " +
@@ -130,7 +153,7 @@ const changePassword = async (data) => {
 
           console.log("Fez a troca de senha!");
 
-          if (MD5(novaSenha) !== MD5(confirmSenha)) {
+          if (novaSenha !== confirmSenha) {
             // Se a nova senha e a confirmação de senha não coincidirem, define o resultado como autenticação falsa
             result = {
               auth: false,
@@ -138,17 +161,24 @@ const changePassword = async (data) => {
             };
             resolve(result);
           } else {
-            // Atualiza a senha do usuário no banco de dados
-            const updateSql = `UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?`;
-            console.log(updateSql);
-            connection.query(updateSql, [MD5(novaSenha), id], (error) => {
-              if (error) {
-                // Em caso de erro ao atualizar a senha, rejeita a Promise com o erro
-                reject(error);
+            // Criptografa a nova senha com Bcrypt
+            bcrypt.hash(novaSenha, 10, (err, hash) => {
+              if (err) {
+                reject(err);
               } else {
-                // Senha atualizada com sucesso, define o resultado como autenticação verdadeira e retorna informações do usuário
-                result = { auth: true, user: results[0] };
-                resolve(result);
+                // Atualiza a senha do usuário no banco de dados
+                const updateSql = `UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?`;
+                console.log(updateSql);
+                connection.query(updateSql, [hash, id], (error) => {
+                  if (error) {
+                    // Em caso de erro ao atualizar a senha, rejeita a Promise com o erro
+                    reject(error);
+                  } else {
+                    // Senha atualizada com sucesso, define o resultado como autenticação verdadeira e retorna informações do usuário
+                    result = { auth: true, user: results[0] };
+                    resolve(result);
+                  }
+                });
               }
             });
           }
