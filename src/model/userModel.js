@@ -1,12 +1,6 @@
-const mysql = require("mysql");
 const jwt = require("jsonwebtoken");
 
-const connection = mysql.createConnection({
-  host: "mysql.infocimol.com.br",
-  user: "infocimol",
-  password: "c1i2m3o4l5",
-  database: "infocimol",
-});
+const connection = require("./mysqlConnect").query();
 
 // Função para buscar todos os usuários
 const get = async () => {

@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+require('dotenv').config();
 
 function query() {
   if (global.connection && global.connection.state !== "disconnected") {

@@ -24,6 +24,7 @@
     "middleware": "^1.0.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.6.1",
+    "nodemailer": "^6.9.5",
     "redis-cache": "^0.2.1",
     "render": "^0.1.4",
     "tiny-lru-cache": "^1.0.1",
