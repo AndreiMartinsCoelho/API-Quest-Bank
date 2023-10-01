@@ -326,6 +326,43 @@ const obterProvaPorId = async (idProva) => {
     }
 };
 
+const buscarProvaPorEnunciado = (enunciado) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
+        FROM infocimol.prova p
+        JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
+        JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
+        WHERE p.enunciado LIKE '%${enunciado}%'
+        ORDER BY p.id_prova DESC`,
+      async (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          const provas = await Promise.all(
+            results.map(async (prova) => {
+              const questoes = await getQuestoes(prova.id_prova);
+              return {
+                id_prova: prova.id_prova,
+                enunciado: prova.enunciado,
+                formato: prova.formato,
+                tipo: prova.tipo,
+                criado_por: {
+                  professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
+                  professor_nome: prova.professor_nome,
+                },
+                descricao: prova.descricao,
+                questoes: questoes,
+              };
+            })
+          );
+          resolve(provas);
+        }
+      }
+    );
+  });
+};
+
 module.exports = {
   get,
   criar,
@@ -335,5 +372,6 @@ module.exports = {
   editarProva,
   excluirProva,
   obterProvaPorId,
-  getAlternativas
+  getAlternativas,
+  buscarProvaPorEnunciado,
 };

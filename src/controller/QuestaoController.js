@@ -131,3 +131,28 @@ exports.obterQuestao = async (req, res) => {
         });
     }
 };
+
+//Função para obter uma questao específica pelo enunciado
+exports.buscarQuestoesPorEnunciado = async (req, res) => {
+  const enunciado = req.params.enunciado;
+  try {
+    const questoes = await QuestaoModel.buscarQuestoesPorEnunciado(enunciado);
+    if (questoes.length > 0) {
+      return res.json({
+        status: 'success',
+        msg: 'Questões encontradas com sucesso...',
+        questoes: questoes
+      });
+    } else {
+      return res.status(404).json({
+        status: 'error',
+        msg: 'Questões não encontradas...',
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      msg: 'Ops! ocorreu um erro ao buscar as questões...',
+    });
+  }
+};

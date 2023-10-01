@@ -341,6 +341,54 @@ const verQuestao = async (idQuestao) => {
   }
 };
 
+const buscarQuestoesPorEnunciado = async (enunciado) => {
+  try {
+    const resultados = await new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT q.id_questao, q.enunciado, t.id_topico, t.enunciado as topico, q.nivel, q.tipo, q.resposta, q.Enunciado_imagem, pr.pessoa_id_pessoa as professor_pessoa_id_pessoa, p.nome as professor_nome, d.id_disciplina, d.nome as nome
+        FROM questao q
+        JOIN topico t ON q.topico_id_topico = t.id_topico
+        JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+        JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+        JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+        WHERE q.enunciado LIKE ?`,
+        [`%${enunciado}%`],
+        (error, resultados) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(resultados);
+          }
+        }
+      );
+    });
+    const questoes = resultados.map((questao) => ({
+      id_questao: questao.id_questao,
+      enunciado: questao.enunciado,
+      enunciado_imagem: questao.Enunciado_imagem,
+      tipo: questao.tipo,
+      nivel: questao.nivel,
+      resposta: questao.resposta,
+      professor: {
+        id_professor: questao.professor_pessoa_id_pessoa,
+        nome: questao.professor_nome,
+      },
+      topico: {
+        id_topico: questao.id_topico,
+        enunciado: questao.topico,
+        disciplina: {
+          id_disciplina: questao.id_disciplina,
+          nome: questao.nome,
+        },
+      }
+    }));
+    console.log(questoes);
+    return (questoes);
+  } catch (error) {
+    return null;
+  }
+};
+
 module.exports = {
   get,
   create,
@@ -349,4 +397,5 @@ module.exports = {
   excluirQuestao,
   verQuestao,
   getAlternativas,
+  buscarQuestoesPorEnunciado,
 };

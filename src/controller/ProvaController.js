@@ -154,3 +154,20 @@ exports.obterProva = async (req, res) => {
         });
     }
 };
+
+exports.buscarProvaPorEnunciado = async (req, res) => {
+  const enunciado = req.params.enunciado;
+  try {
+    const provas = await ProvaModel.buscarProvaPorEnunciado(enunciado);
+    return res.json({
+      status: 'success',
+      msg: 'Provas encontradas com sucesso...',
+      provas: provas
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      msg: 'Ops! ocorreu um erro ao buscar as provas...',
+    });
+  }
+};

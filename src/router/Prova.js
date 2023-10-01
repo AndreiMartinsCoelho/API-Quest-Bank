@@ -29,4 +29,7 @@ ProvaRouter.delete('/prova/deletar/:id', ProvaController.excluir);
 //Função para obter uma prova específica pelo seu ID
 ProvaRouter.get('/prova/listar/:id', ProvaController.obterProva);
 
+//Função para obter uma prova específica pelo enunciado
+ProvaRouter.get('/prova/buscar/:enunciado', ProvaController.buscarProvaPorEnunciado);
+
 module.exports = ProvaRouter;

@@ -29,4 +29,7 @@ QuestaoRouter.delete('/questao/deletar/:id', QuestaoController.excluir);
 //Função para obter uma questão específica pelo seu ID
 QuestaoRouter.get('/questao/listar/:id', QuestaoController.obterQuestao);
 
+//Função para obter uma questão específica pelo enunciado
+QuestaoRouter.get('/questao/buscar/:enunciado', QuestaoController.buscarQuestoesPorEnunciado);
+
 module.exports = QuestaoRouter;

@@ -25,4 +25,7 @@ TopicoRouter.put('/topico/atualizar/:id', TopicoController.editar);
 //Rota para obter um tópico específico pelo seu ID
 TopicoRouter.get('/topico/listar/:id', TopicoController.listaId);
 
+//Rota para buscar um tópico pelo enunciado
+TopicoRouter.get('/topico/buscar/:enunciado', TopicoController.buscar);
+
 module.exports = TopicoRouter;

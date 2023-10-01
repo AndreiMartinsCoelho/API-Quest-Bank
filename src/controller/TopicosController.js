@@ -142,3 +142,28 @@ exports.listaId = async (req, res) => {
         });
     }
 };
+
+//Função para buscar um topico pelo enunciado
+exports.buscar = async (req, res) => {
+  const enunciado = req.params.enunciado;
+  try {
+    const topico = await TopicoModel.obterTopicoPorEnunciado(enunciado);
+    if (topico) {
+      return res.json({
+        status: 'success',
+        msg: 'Tópico encontrado com sucesso...',
+        topico: topico
+      });
+    } else {
+      return res.status(404).json({
+        status: 'error',
+        msg: 'Tópico não encontrado...',
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      msg: 'Ops! ocorreu um erro ao buscar o tópico...',
+    });
+  }
+};
