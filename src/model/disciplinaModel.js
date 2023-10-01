@@ -17,7 +17,8 @@ const get = () => {
 };
 
 //Função para listar disciplinas
-const list = () => {
+const list = (data) => {
+  const { id } = data;
   return new Promise((resolve, reject) => {
     connection.query(
       "SELECT id_disciplina, nome FROM `infocimol`.`disciplina` ORDER BY id_disciplina DESC;",
