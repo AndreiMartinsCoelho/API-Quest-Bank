@@ -17,17 +17,20 @@ const get = () => {
 };
 
 //Função para listar disciplinas
-const list = (data) => {
-  const { id } = data;
+const list = () => {
   return new Promise((resolve, reject) => {
     connection.query(
-      "SELECT id_disciplina, nome FROM `infocimol`.`disciplina` WHERE ORDER BY id_disciplina DESC = ?;",
+      "SELECT id_disciplina, nome FROM `infocimol`.`disciplina` ORDER BY id_disciplina DESC;",
       [id],
       (error, rows) => {
         if (error) {
           reject(error);
         } else {
-          resolve(rows);
+          const disciplines = rows.map((row) => ({
+            value: row.id_disciplina,
+            label: row.nome,
+          }));
+          resolve(disciplines);
         }
       }
     );
