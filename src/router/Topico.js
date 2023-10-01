@@ -2,17 +2,12 @@ const express = require('express');
 const TopicoRouter = express.Router();
 const TopicoController = require('../controller/TopicosController');
 
-//Rota para obter o tópico
-TopicoRouter.get('/', async (req, res, next) => {
-    user = await TopicoController.get(req.headers);
-    res.status(200).send(user);
-});
-
 //Rota para listar o tópico
 TopicoRouter.get('/topico/listar', async(req, res, next)=>{
-    user=await TopicoController.get(req.body);
+    const { idProfessor } = req.query;
+    const user = await TopicoController.get(req.body, { idProfessor });
     res.status(200).send(user);
-})
+});
 
 //Rota para criar o tópico
 TopicoRouter.post('/topico/adicionar', async(req, res, next) => {

@@ -1,51 +1,12 @@
 const connection = require("./mysqlConnect").query();
 
-// Função para obter um tópico específico pelo seu ID
-const list = (data) => {
-  const { id } = data;
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT t.id_topico, t.enunciado, 
-      p.id_pessoa, p.nome AS nome_pessoa,
-      u.pessoa_id_pessoa AS "usuario.id_pessoa", 
-      u.perfil AS "usuario.perfil",
-      d.id_disciplina AS "disciplina.id_disciplina", 
-      d.nome AS "disciplina.nome_disciplina"
-      FROM infocimol.topico t
-      JOIN pessoa p ON t.professor_pessoa_id_pessoa = p.id_pessoa
-      JOIN usuario u ON p.id_pessoa = u.pessoa_id_pessoa
-      JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
-      ORDER BY t.id_topico DESC`,
-      [id],
-      (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          const topicos = results.map((topico) => ({
-            id_topico: topico.id_topico,
-            enunciado: topico.enunciado,
-            usuario: {
-              id_pessoa: topico["usuario.id_pessoa"],
-              perfil: topico["usuario.perfil"],
-            },
-            disciplina: {
-              id_disciplina: topico["disciplina.id_disciplina"],
-              nome_disciplina: topico["disciplina.nome_disciplina"],
-            },
-          }));
-          resolve(topicos);
-        }
-      }
-    );
-  });
-};
-
 // Função para criar um tópico
 const criarTopico = async (enunciado, idDisciplina, idProfessor) => {
   try {
     const novoIdTopico = await obterNovoIdTopico();
     const nomePessoa = await obterNomePessoa(idProfessor);
     const perfil = await obterPerfilUsuario(idProfessor);
+    const nomeDisciplina = await obterNomeDisciplina(idDisciplina);
 
     await new Promise((resolve, reject) => {
       connection.query(
@@ -71,8 +32,31 @@ const criarTopico = async (enunciado, idDisciplina, idProfessor) => {
       },
       disciplina: {
         id_disciplina: idDisciplina,
+        nome_disciplina: nomeDisciplina,
       },
     };
+  } catch (error) {
+    return null; // Retorna null em caso de erro
+  }
+};
+
+//Função para obter o nome da disciplina
+const obterNomeDisciplina = async (idDisciplina) => {
+  try {
+    const disciplina = await new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT nome FROM disciplina WHERE id_disciplina = ? LIMIT 1`,
+        [idDisciplina],
+        (error, resultados) => {
+          if (error) {
+            resolve(null); // Retorna null em caso de erro
+          } else {
+            resolve(resultados[0]?.nome || "");
+          }
+        }
+      );
+    });
+    return disciplina;
   } catch (error) {
     return null; // Retorna null em caso de erro
   }
@@ -107,7 +91,7 @@ const obterTodosOsTopicos = async () => {
   try {
     const resultados = await new Promise((resolve, reject) => {
       connection.query(
-        `SELECT t.id_topico, t.enunciado, p.id_pessoa, p.nome AS nome_pessoa,
+        `SELECT t.id_topico, t.enunciado, p.id_pessoa, p.nome AS nome_pessoa, t.professor_pessoa_id_pessoa,
           p.id_pessoa AS "usuario.pesosa_id_pessoa", u.perfil AS "usuario.perfil",
           d.id_disciplina AS "disciplina.id_disciplina", d.nome AS "disciplina.nome_disciplina"
           FROM topico t
@@ -125,18 +109,27 @@ const obterTodosOsTopicos = async () => {
       );
     });
 
-    const topicos = resultados.map((topico) => ({
-      id_topico: topico.id_topico,
-      enunciado: topico.enunciado,
-      usuario: {
-        id_pessoa: topico["usuario.id_pessoa"],
-        perfil: topico["usuario.perfil"],
-      },
-      disciplina: {
-        id_disciplina: topico["disciplina.id_disciplina"],
-        nome_disciplina: topico["disciplina.nome_disciplina"],
-      },
-    }));
+    const topicos = [];
+
+    for (let i = 0; i < resultados.length; i++) {
+      const nomePessoa = await obterNomePessoa(resultados[i].professor_pessoa_id_pessoa);
+
+      const topico = {
+        id_topico: resultados[i].id_topico,
+        enunciado: resultados[i].enunciado,
+        usuario: {
+          id_pessoa: resultados[i].professor_pessoa_id_pessoa,
+          nome_pessoa: nomePessoa,
+          perfil: resultados[i]["usuario.perfil"],
+        },
+        disciplina: {
+          id_disciplina: resultados[i]["disciplina.id_disciplina"],
+          nome_disciplina: resultados[i]["disciplina.nome_disciplina"],
+        },
+      };
+
+      topicos.push(topico);
+    }
 
     return topicos;
   } catch (error) {
@@ -218,9 +211,11 @@ const excluir = async (idTopico) => {
       connection.query(
         `DELETE FROM topico WHERE id_topico = ?`,
         [idTopico],
-        (error) => {
+        (error, results) => {
           if (error) {
             reject(error); // Rejeita o erro em caso de falha
+          } else if (results.affectedRows === 0) {
+            reject(new Error("O id do tópico não existe mais."));
           } else {
             resolve({ auth: true });
           }
@@ -251,10 +246,9 @@ const editar = async (idTopico, enunciado) => {
       );
     });
 
-    return {
-      id_topico: idTopico,
-      enunciado,
-    };
+    const topico = await obterTopicoPorId(idTopico);
+
+    return topico;
   } catch (error) {
     throw error; // Lança o erro para ser capturado no bloco catch
   }
@@ -305,12 +299,12 @@ const obterTopicoPorId = async (idTopico) => {
 };
 
 module.exports = {
-  list,
   criarTopico,
   obterIdDisciplinaPorNome,
   obterTodosOsTopicos,
   obterNovoIdTopico,
   excluir,
   editar,
-  obterTopicoPorId
+  obterTopicoPorId,
+  obterNomeDisciplina
 };

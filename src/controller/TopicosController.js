@@ -1,23 +1,5 @@
 const TopicoModel = require("../model/TopicoModel");
 
-//Função para listar o tópico
-exports.listar = async (body) => {
-  const result = await TopicoModel.list(body);
-  if (result.auth) {
-    return {
-      status: "success",
-      msg: "Topicos listados com sucesso!",
-      topicos: result.topicos,
-    };
-  } else {
-    // Tratar caso em que não há autenticação
-    return {
-      status: "error",
-      msg: "Credenciais inválidas. Verifique suas credenciais e tente novamente.",
-    };
-  }
-};
-
 //Função para criar o tópico
 exports.criar = async (data) => {
   try {
@@ -26,7 +8,7 @@ exports.criar = async (data) => {
     if (!enunciado || !nome_disciplina) {
       return {
         status: "error",
-        msg: "Por favor, forneça o enunciado do tópico e o nome da disciplina no corpo da requisição.",
+        msg: "Ops! Preencha todos os campos obrigatórios...",
       };
     }
 
@@ -35,7 +17,7 @@ exports.criar = async (data) => {
     if (!professorId) {
       return {
         status: "error",
-        msg: "O ID do professor não foi fornecido no cabeçalho da requisição.",
+        msg: "Ops! Você precisa estar logado para adicionar um tópico..."
       };
     }
 
@@ -46,7 +28,7 @@ exports.criar = async (data) => {
     if (!disciplinaId) {
       return {
         status: "error",
-        msg: "Disciplina não encontrada com o nome fornecido.",
+        msg: "Ops! A disciplina informada não existe..."
       };
     }
 
@@ -58,14 +40,14 @@ exports.criar = async (data) => {
 
     return {
       status: "success",
-      msg: "Tópico criado com sucesso!",
+      msg: "Tópico adicionado com sucesso...",
       topico: newTopic,
     };
   } catch (error) {
-    console.error("Erro ao criar tópico:", error);
+    console.error("Erro ao adicionar o tópico:", error);
     return {
       status: "error",
-      msg: "Ocorreu um erro ao criar o tópico. Por favor, tente novamente mais tarde.",
+      msg: "Ops! Ocrreu um erro fatal ao adicionar o tópico...",
     };
   }
 };
@@ -76,10 +58,10 @@ exports.get = async () => {
     const topics = await TopicoModel.obterTodosOsTopicos();
     return { status: "success", msg: "Tópicos obtidos com sucesso!", topics };
   } catch (error) {
-    console.error("Erro ao obter tópicos:", error);
+    console.error("Erro ao pegar os tópicos:", error);
     return {
       status: "error",
-      msg: "Ocorreu um erro ao obter os tópicos. Por favor, tente novamente mais tarde.",
+      msg: "Ops! Ocorreu um erro fatal ao obter os tópicos...",
     };
   }
 };
@@ -93,46 +75,47 @@ exports.excluir = async (req, res) => {
     if (result.auth) {
       return res.json({
         status: "success",
-        msg: "Tópico excluído com sucesso! E todas as questões relacionadas a ele também foram excluídas(incluindo alternativas).",
+        msg: "Tópico excluído com sucesso...",
       });
     } else {
       // Tratar caso em que não há autenticação
       return res.status(401).json({
         status: "error",
-        msg: "Credenciais inválidas. Verifique suas credenciais e tente novamente.",
+        msg: "Ops! Você precisa estar logado...",
       });
     }
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      msg: "Erro ao excluir o tópico.",
+      msg: "Ops! Ocorreu um erro fatal ao deletar o tópico...",
     });
   }
 };
 
 //Função para editar o tópico
 exports.editar = async (req, res) => {
-    const idTopico = req.params.id;
-    const enunciado = req.body.enunciado.toString();
-    try {
-        const result = await TopicoModel.editar(idTopico, enunciado);
-        if (result) {
-            return res.json({
-                status: "success",
-                msg: "Tópico editado com sucesso!"
-            });
-        } else {
-            return res.status(500).json({
-                status: "error",
-                msg: "Erro ao editar o tópico.",
-            });
-        }
-    } catch (error) {
-        return res.status(500).json({
-            status: "error",
-            msg: "Erro ao editar o tópico.",
-        });
+  const idTopico = req.params.id;
+  const enunciado = req.body.enunciado.toString();
+  try {
+    const result = await TopicoModel.editar(idTopico, enunciado);
+    if (result) {
+      return res.json({
+        status: "success",
+        msg: "Tópico atualizado com sucesso...",
+        topico: result,
+      });
+    } else {
+      return res.status(500).json({
+        status: "error",
+        msg: "Ops! Ocorreu um erro fatal ao atualizar o tópico...",
+      });
     }
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      msg: "Ops! Ocorreu um erro ao atualizar o tópico...",
+    });
+  }
 };
 
 //Função para obter um topico pelo id
@@ -143,19 +126,19 @@ exports.listaId = async (req, res) => {
         if (result) {
             return res.json({
                 status: "success",
-                msg: "Tópico obtido com sucesso!",
+                msg: "Tópico obtido com sucesso...",
                 topico: result,
             });
         } else {
             return res.status(500).json({
                 status: "error",
-                msg: "Erro ao obter o tópico.",
+                msg: "Ops! Ocorreu um erro ao obter o tópico...",
             });
         }
     } catch (error) {
         return res.status(500).json({
             status: "error",
-            msg: "Erro ao obter o tópico.",
+            msg: "Ops! Ocorreu um erro fatal ao obter o tópico...",
         });
     }
 };
