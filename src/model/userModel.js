@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-
+require('dotenv').config();
 const connection = require("./mysqlConnect").query();
 
 // Função para buscar todos os usuários
@@ -46,9 +46,10 @@ const login = async (data) => {
               if (err) {
                 reject(err);
               } else if (res) {
-                const token = jwt.sign({ id }, "infocimol", { expiresIn: "1h" });
-
-                console.log("Fez login e gerou token!");
+                const payload = {id};
+                const secret = process.env.JWT_SECRET;
+                const options = { expiresIn: '28800000' };
+                const token = jwt.sign(payload, secret, options);
 
                 const perfil = [];
                 if (results[0].professor > 0) {
@@ -99,31 +100,25 @@ const login = async (data) => {
 // Função para verificar a validade do token JWT
 const verifyJWT = async (token, perfil) => {
   try {
-    const decoded = jwt.verify(token, "infocimol");
-
-    return new Promise((resolve, reject) => {
-      const sql = "SELECT perfil FROM usuario WHERE pessoa_id_pessoa = ?";
-      connection.query(sql, [decoded.id], (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          if (results.length > 0) {
-            const perfilList = results[0].perfil.split(",");
-            if (perfilList.includes(perfil)) {
-              resolve({ auth: true, idUser: decoded.id });
-            } else {
-              resolve({ auth: false, message: "Perfil Inválido!" });
-            }
-          } else {
-            resolve({ auth: false, message: "Perfil Inválido!" });
-          }
-        }
-      });
-    });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const connection = await connect(); // Obtenha uma conexão ao banco de dados
+    const sql = "SELECT perfil FROM usuario WHERE pessoa_id_pessoa = ?";
+    const [results] = await connection.query(sql, [decoded.id]);
+    console.log('Resultados:', decoded.id, results);
+    if (results.length > 0) {
+      const perfilList = results[0].perfil.split(",");
+      if (perfilList.includes(perfil)) {
+        return { auth: true, idUser: decoded.id };
+      } else {
+        return { auth: false, message: "Perfil Inválido!" };
+      }
+    } else {
+      return { auth: false, message: "Perfil Inválido!" };
+    }
   } catch (err) {
     return { auth: false, message: "Token inválido!" };
   }
-};
+}; 
 
 // Função para trocar a senha do usuário
 const changePassword = async (data) => {
