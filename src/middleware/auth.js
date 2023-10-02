@@ -17,12 +17,24 @@ module.exports = {
       // Verifica se o token é válido
       try {
         decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log(decoded);
       } catch (error) {
         console.error("Ops! Token inválido:", error);
         return res.status(401).json({ auth: false, message: "Token inválido" });
       }
 
+      // Verifica se o usuário associado ao token ainda existe no banco de dados
+      const user = await userModel.login(decoded.id);
+      if (!user) {
+        return res.status(401).json({ auth: false, message: "Usuário não encontrado" });
+      }
+
+      // Verifica se o token ainda é válido de acordo com a data de expiração
+      const now = Date.now().valueOf() / 1000;
+      if (decoded.exp < now) {
+        return res.status(401).json({ auth: false, message: "Token expirado" });
+      }
+
+      // Tudo certo! O usuário está autenticado
       req.userId = decoded.id;
       next();
     } catch (error) {
