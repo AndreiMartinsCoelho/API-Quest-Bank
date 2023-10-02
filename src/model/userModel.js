@@ -58,26 +58,15 @@ const login = async (data) => {
                   perfil.push("admin");
                 }
 
-                results[0].perfil = perfil;
-
-                const updateSql =
-                  "UPDATE usuario SET perfil = ? WHERE pessoa_id_pessoa = ?";
-
-                connection.query(updateSql, [perfil.toString(), id], (error) => {
-                  if (error) {
-                    reject(error);
-                  } else {
-                    const result = { auth: true, token, user: { 
-                      id: results[0].id, 
-                      nome: results[0].nome, 
-                      email: results[0].email,
-                      professor: results[0].professor,
-                      admin: results[0].admin,
-                      perfil: perfil
-                    }};
-                    resolve(result);
-                  }
-                });
+                const result = { auth: true, token, user: { 
+                  id: results[0].id, 
+                  nome: results[0].nome, 
+                  email: results[0].email,
+                  professor: results[0].professor,
+                  admin: results[0].admin,
+                  perfil: perfil
+                }};
+                resolve(result);
               } else {
                 const result = { auth: false, message: "Credenciais inválidas" };
                 resolve(result);
