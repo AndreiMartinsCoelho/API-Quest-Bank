@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 require('dotenv').config();
 const userModel = require("../model/userModel");
 
+
 module.exports = {
   verifyToken: async (req, res, next) => {
     try {

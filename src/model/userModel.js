@@ -32,7 +32,6 @@ const login = async (data) => {
     `FROM usuario u ` +
     `JOIN pessoa p ON p.id_pessoa=u.pessoa_id_pessoa ` +
     `WHERE p.email = ?`;
-
     connection.query(sql, [email], async (error, results) => {
       if (error) {
         reject(error);
