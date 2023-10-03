@@ -33,4 +33,7 @@ ProvaRouter.get('/prova/listar/:id', ProvaController.obterProva, Middleware.veri
 //Função para obter uma prova específica pelo enunciado
 ProvaRouter.get('/prova/buscar/:enunciado', ProvaController.buscarProvaPorEnunciado,Middleware.verifyToken);
 
+//Função para gerar a prova em PDF
+ProvaRouter.get('/provas/:id/gerar-pdf', ProvaController.gerarProva);
+
 module.exports = ProvaRouter;

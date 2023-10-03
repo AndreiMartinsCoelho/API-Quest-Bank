@@ -1,4 +1,5 @@
 const ProvaModel = require("../model/ProvaModel");
+const fs = require('fs');
 
 //Função para obter as provas
 exports.get = async (headers) => {
@@ -169,5 +170,31 @@ exports.buscarProvaPorEnunciado = async (req, res) => {
       status: 'error',
       msg: 'Ops! ocorreu um erro ao buscar as provas...',
     });
+  }
+};
+
+//Função para gerar a prova em PDF
+exports.gerarProva = async(req, res) => {
+  try {
+    const prova = await ProvaModel.obterProvaPorId(req.params.id);
+
+    if (!prova) {
+      return res.status(404).json({ error: 'Prova não encontrada' });
+    }
+    const gerarPDF = ProvaModel.gerarPDF;
+    const nomeArquivo = gerarPDF(prova); // Chama a função gerarPDF sem usar o modelo
+    
+    res.setHeader('Content-Type', 'application/pdf'); // Define o tipo de conteúdo do arquivo PDF
+    res.download(nomeArquivo, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Erro ao baixar o arquivo' });
+      }
+    
+      fs.unlinkSync(nomeArquivo);
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao gerar a prova' });
   }
 };

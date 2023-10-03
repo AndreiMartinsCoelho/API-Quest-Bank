@@ -1,4 +1,6 @@
 const connection = require("./mysqlConnect").query();
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 //Função para criar uma prova
 const criar = (novaProva) => {
@@ -286,46 +288,7 @@ const excluirProva = (idProva) =>{
   });
 }
 
-//Função para obter uma prova específico pelo seu ID
-const obterProvaPorId = async (idProva) => {
-    try {
-        const resultados = await new Promise((resolve, reject) => {
-            connection.query(
-            `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
-            FROM infocimol.prova p
-            JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
-            JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
-            WHERE p.id_prova = ?`,
-            [idProva],
-            (error, resultados) => {
-                if (error) {
-                resolve(null); // Retorna null em caso de erro
-                } else {
-                resolve(resultados);
-                }
-            }
-            );
-        });
-        const questoes = await getQuestoes(idProva);
-        const prova = resultados.map((prova) => ({
-            id_prova: prova.id_prova,
-            enunciado: prova.enunciado,
-            formato: prova.formato,
-            tipo: prova.tipo,
-            criado_por: {
-              professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
-              professor_nome: prova.professor_nome,
-            },
-            descricao: prova.descricao,
-            questoes: questoes,
-        }));
-    
-        return prova;
-    } catch (error) {
-        return null; // Retorna null em caso de erro
-    }
-};
-
+//Função para buscar uma prova pelo enunciado
 const buscarProvaPorEnunciado = (enunciado) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -363,6 +326,115 @@ const buscarProvaPorEnunciado = (enunciado) => {
   });
 };
 
+//Função para gerar a prova em PDF
+const gerarPDF = (prova) => {
+  if (!prova || !prova.id_prova) {
+    throw new Error('Prova inválida');
+  }
+
+  const nomeArquivo = `prova_${prova.id_prova}.pdf`;
+  const stream = fs.createWriteStream(nomeArquivo);
+  const doc = new PDFDocument();
+
+  doc.info.Title = `Prova ${prova.id_prova}`;
+
+  // Adiciona o cabeçalho
+  // doc.image('caminho_para_seu_logo.png', 50, 45, { width: 50 })
+    doc.font('Helvetica-Bold')
+    .fontSize(12)
+    .text('Nome da Sua Instituição', 110, 50)
+    .fontSize(10)
+    .text('Endereço da Instituição', 200, 50, { align: 'right' })
+    .text('Telefone: (11) 1234-5678', 200, 65, { align: 'right' })
+    .text('Email: instituicao@exemplo.com', 200, 80, { align: 'right' })
+    .moveDown();
+
+  // Adiciona o enunciado da prova
+  doc.font('Helvetica')
+    .fontSize(14)
+    .text(`Enunciado: ${prova.enunciado}`, { align: 'left' })
+    .moveDown(0.5);
+
+  // Adiciona a descrição da prova
+  doc.fontSize(12)
+    .text(`Descrição: ${prova.descricao}`, { align: 'left' })
+    .moveDown(0.5);
+
+  // Adiciona as questões da prova
+  if (prova.questoes && prova.questoes.length > 0) {
+    prova.questoes.forEach((questao, index) => {
+      doc.fontSize(12)
+        .text(`${index + 1}) ${questao.questao_enunciado}`, { align: 'left' });
+
+      // Adiciona as alternativas da questão
+      if (questao.alternativas && questao.alternativas.length > 0) {
+        questao.alternativas.forEach((alternativa, index) => {
+          doc.text(`${String.fromCharCode(97 + index)}) ${alternativa.enunciado}`, { align: 'left', indent: 20 });
+        });
+      }
+
+      // Adiciona a resposta correta da questão
+      doc.text(`Resposta correta: ${questao.questao_resposta}`, { align: 'left', indent: 20 });
+
+      doc.moveDown(0.5);
+    });
+  }
+
+  // Adiciona o rodapé
+  doc.fontSize(8)
+    .text('Página 1 de 1', 50, doc.page.height - 50, { align: 'center' });
+
+  stream.on('finish', () => {
+    console.log(`Arquivo ${nomeArquivo} gerado com sucesso`);
+    stream.close();
+  });
+
+  doc.pipe(stream);
+  doc.end();
+
+  return nomeArquivo;
+};
+
+//Função para obter uma prova específico pelo seu ID
+const obterProvaPorId = async (idProva) => {
+  try {
+      const resultados = await new Promise((resolve, reject) => {
+          connection.query(
+          `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
+          FROM infocimol.prova p
+          JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
+          JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
+          WHERE p.id_prova = ?`,
+          [idProva],
+          (error, resultados) => {
+              if (error) {
+              resolve(null); // Retorna null em caso de erro
+              } else {
+              resolve(resultados);
+              }
+          }
+          );
+      });
+      const questoes = await getQuestoes(idProva);
+      const prova = resultados.map((prova) => ({
+          id_prova: prova.id_prova,
+          enunciado: prova.enunciado,
+          formato: prova.formato,
+          tipo: prova.tipo,
+          criado_por: {
+            professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
+            professor_nome: prova.professor_nome,
+          },
+          descricao: prova.descricao,
+          questoes: questoes,
+      }))[0]; // Retorna apenas o primeiro elemento do array
+  
+      return prova;
+  } catch (error) {
+      return null; // Retorna null em caso de erro
+  }
+};
+
 module.exports = {
   get,
   criar,
@@ -374,4 +446,5 @@ module.exports = {
   obterProvaPorId,
   getAlternativas,
   buscarProvaPorEnunciado,
+  gerarPDF,
 };
