@@ -385,7 +385,7 @@ const gerarPDF = (prova) => {
           const RandomAlternativas = ArrayRandom(questao.alternativas);
           RandomAlternativas.forEach((alternativa, index) => {
             doc.text(
-              `${String.char(97 + index)}) ${alternativa.enunciado}`,
+              `${String.fromCharCode(97 + index)}) ${alternativa.enunciado}`,
               { align: "left", indent: 20 }
             );
           });
