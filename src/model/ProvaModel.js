@@ -1,6 +1,6 @@
 const connection = require("./mysqlConnect").query();
-const PDFDocument = require('pdfkit');
-const fs = require('fs');
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
 
 //Função para criar uma prova
 const criar = (novaProva) => {
@@ -111,26 +111,30 @@ const getQuestoes = (provaId) => {
         if (error) {
           reject(error);
         } else {
-          const questoes = await Promise.all(results.map(async (questao) => {
-            const alternativas = await getAlternativas(questao.questao_id);
-            return {
-              questao_id: questao.questao_id,
-              questao_enunciado: questao.questao_enunciado,
-              questao_tipo: questao.questao_tipo,
-              questao_nivel: questao.questao_nivel,
-              questao_enunciado_imagem: questao.questao_enunciado_imagem,
-              questao_resposta: questao.questao_resposta,
-              topicos:{
-                questao_topico_id_topico: questao.questao_topico_id_topico,
-                questao_topico_enunciado: questao.questao_topico_enunciado,
-                disciplina:{
-                  questao_topico_disciplina_id_disciplina: questao.questao_topico_disciplina_id_disciplina,
-                  questao_topico_disciplina_nome: questao.questao_topico_disciplina_nome,
-                }
-              },
-              alternativas: alternativas,
-            };
-          }));
+          const questoes = await Promise.all(
+            results.map(async (questao) => {
+              const alternativas = await getAlternativas(questao.questao_id);
+              return {
+                questao_id: questao.questao_id,
+                questao_enunciado: questao.questao_enunciado,
+                questao_tipo: questao.questao_tipo,
+                questao_nivel: questao.questao_nivel,
+                questao_enunciado_imagem: questao.questao_enunciado_imagem,
+                questao_resposta: questao.questao_resposta,
+                topicos: {
+                  questao_topico_id_topico: questao.questao_topico_id_topico,
+                  questao_topico_enunciado: questao.questao_topico_enunciado,
+                  disciplina: {
+                    questao_topico_disciplina_id_disciplina:
+                      questao.questao_topico_disciplina_id_disciplina,
+                    questao_topico_disciplina_nome:
+                      questao.questao_topico_disciplina_nome,
+                  },
+                },
+                alternativas: alternativas,
+              };
+            })
+          );
           resolve(questoes);
         }
       }
@@ -231,12 +235,7 @@ const editarProva = (enunciado, descricao, tipo, idProva) => {
           // Update the prova information in the database
           connection.query(
             `UPDATE prova SET descricao = ?, tipo = ?, enunciado = ? WHERE id_prova = ?`,
-            [
-              descricao,
-              tipo,
-              enunciado,
-              idProva,
-            ],
+            [descricao, tipo, enunciado, idProva],
             async (error, results) => {
               if (error) {
                 reject(error);
@@ -249,7 +248,7 @@ const editarProva = (enunciado, descricao, tipo, idProva) => {
                   tipo: tipo,
                   criado_por: prova.professor_pessoa_id_pessoa,
                   descricao: descricao,
-                  questoes: questoes
+                  questoes: questoes,
                 });
               }
             }
@@ -261,32 +260,33 @@ const editarProva = (enunciado, descricao, tipo, idProva) => {
 };
 
 //Função para excluir prova
-const excluirProva = (idProva) =>{
+const excluirProva = (idProva) => {
   return new Promise((resolve, reject) => {
     connection.query(
-    `SELECT * FROM prova WHERE id_prova = ?`,
-    [idProva],
-    (error, results) => {
-      if (error) {
-        reject(error);
-      } else if (results.length === 0) {
-        reject(new Error(`Prova com id ${idProva} não existe no banco.`));
-      } else {
-        connection.query(
-          `DELETE FROM prova WHERE id_prova = ?`,
-          [idProva],
-          (error, results) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(results);
+      `SELECT * FROM prova WHERE id_prova = ?`,
+      [idProva],
+      (error, results) => {
+        if (error) {
+          reject(error);
+        } else if (results.length === 0) {
+          reject(new Error(`Prova com id ${idProva} não existe no banco.`));
+        } else {
+          connection.query(
+            `DELETE FROM prova WHERE id_prova = ?`,
+            [idProva],
+            (error, results) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(results);
+              }
             }
-          }
-        );
+          );
+        }
       }
-    });
+    );
   });
-}
+};
 
 //Função para buscar uma prova pelo enunciado
 const buscarProvaPorEnunciado = (enunciado) => {
@@ -329,7 +329,7 @@ const buscarProvaPorEnunciado = (enunciado) => {
 //Função para gerar a prova em PDF
 const gerarPDF = (prova) => {
   if (!prova || !prova.id_prova) {
-    throw new Error('Prova inválida');
+    throw new Error("Prova inválida");
   }
 
   const nomeArquivo = `prova_${prova.id_prova}.pdf`;
@@ -340,36 +340,55 @@ const gerarPDF = (prova) => {
 
   // Adiciona o cabeçalho
   // doc.image('caminho_para_seu_logo.png', 50, 45, { width: 50 })
-    doc.font('Helvetica-Bold')
+  doc
+    .font("Helvetica-Bold")
     .fontSize(12)
-    .text('Nome da Sua Instituição', 110, 50)
+    .text("Nome da Sua Instituição", 110, 50)
     .fontSize(10)
-    .text('Endereço da Instituição', 200, 50, { align: 'right' })
-    .text('Telefone: (11) 1234-5678', 200, 65, { align: 'right' })
-    .text('Email: instituicao@exemplo.com', 200, 80, { align: 'right' })
+    .text("Endereço da Instituição", 200, 50, { align: "right" })
+    .text("Telefone: (11) 1234-5678", 200, 65, { align: "right" })
+    .text("Email: instituicao@exemplo.com", 200, 80, { align: "right" })
     .moveDown();
 
   // Adiciona o enunciado da prova
-  doc.font('Helvetica')
+  doc
+    .font("Helvetica")
     .fontSize(14)
-    .text(`Enunciado: ${prova.enunciado}`, { align: 'left' })
+    .text(`Enunciado: ${prova.enunciado}`, { align: "left" })
     .moveDown(0.5);
 
   // Adiciona a descrição da prova
-  doc.fontSize(12)
-    .text(`Descrição: ${prova.descricao}`, { align: 'left' })
+  doc
+    .fontSize(12)
+    .text(`Descrição: ${prova.descricao}`, { align: "left" })
     .moveDown(0.5);
+
+  //Array que armazena as questões da prova em ordem aleatória
+  function ArrayRandom(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
 
   // Adiciona as questões da prova
   if (prova.questoes && prova.questoes.length > 0) {
-    prova.questoes.forEach((questao, index) => {
-      doc.fontSize(12)
-        .text(`${index + 1}) ${questao.questao_enunciado}`, { align: 'left' });
+    // Shuffle questions
+    const QuestoesRandom = ArrayRandom(prova.questoes);
+    QuestoesRandom.forEach((questao, index) => {
+      doc
+        .fontSize(12)
+        .text(`${index + 1}) ${questao.questao_enunciado}`, { align: "left" });
 
-      // Adiciona as alternativas da questão
+      //Alternativas de cada questão em ordem aleatória
       if (questao.alternativas && questao.alternativas.length > 0) {
-        questao.alternativas.forEach((alternativa, index) => {
-          doc.text(`${String.fromCharCode(97 + index)}) ${alternativa.enunciado}`, { align: 'left', indent: 20 });
+        const RandomAlternativas = ArrayRandom(questao.alternativas);
+        RandomAlternativas.forEach((alternativa, index) => {
+          doc.text(
+            `${String.fromCharCode(97 + index)}) ${alternativa.enunciado}`,
+            { align: "left", indent: 20 }
+          );
         });
       }
 
@@ -381,12 +400,12 @@ const gerarPDF = (prova) => {
   }
 
   // Adiciona o rodapé
-  doc.fontSize(8)
-    .text('Página 1 de 1', 50, doc.page.height - 50, { align: 'center' });
+  doc
+    .fontSize(8)
+    .text("Página 1 de 1", 50, doc.page.height - 50, { align: "center" });
 
-  stream.on('finish', () => {
+  stream.on("finish", () => {
     console.log(`Arquivo ${nomeArquivo} gerado com sucesso`);
-    stream.close();
   });
 
   doc.pipe(stream);
@@ -398,40 +417,40 @@ const gerarPDF = (prova) => {
 //Função para obter uma prova específico pelo seu ID
 const obterProvaPorId = async (idProva) => {
   try {
-      const resultados = await new Promise((resolve, reject) => {
-          connection.query(
-          `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
+    const resultados = await new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
           FROM infocimol.prova p
           JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
           JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
           WHERE p.id_prova = ?`,
-          [idProva],
-          (error, resultados) => {
-              if (error) {
-              resolve(null); // Retorna null em caso de erro
-              } else {
-              resolve(resultados);
-              }
+        [idProva],
+        (error, resultados) => {
+          if (error) {
+            resolve(null); // Retorna null em caso de erro
+          } else {
+            resolve(resultados);
           }
-          );
-      });
-      const questoes = await getQuestoes(idProva);
-      const prova = resultados.map((prova) => ({
-          id_prova: prova.id_prova,
-          enunciado: prova.enunciado,
-          formato: prova.formato,
-          tipo: prova.tipo,
-          criado_por: {
-            professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
-            professor_nome: prova.professor_nome,
-          },
-          descricao: prova.descricao,
-          questoes: questoes,
-      }))[0]; // Retorna apenas o primeiro elemento do array
-  
-      return prova;
+        }
+      );
+    });
+    const questoes = await getQuestoes(idProva);
+    const prova = resultados.map((prova) => ({
+      id_prova: prova.id_prova,
+      enunciado: prova.enunciado,
+      formato: prova.formato,
+      tipo: prova.tipo,
+      criado_por: {
+        professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
+        professor_nome: prova.professor_nome,
+      },
+      descricao: prova.descricao,
+      questoes: questoes,
+    }))[0]; // Retorna apenas o primeiro elemento do array
+
+    return prova;
   } catch (error) {
-      return null; // Retorna null em caso de erro
+    return null; // Retorna null em caso de erro
   }
 };
 
