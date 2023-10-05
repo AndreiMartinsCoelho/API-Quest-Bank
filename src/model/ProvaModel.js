@@ -372,27 +372,28 @@ const gerarPDF = (prova) => {
     return array;
   }
 
-  //Adiciona as questões da prova
+  // Adiciona as questões da prova
   if (prova.questoes && prova.questoes.length > 0) {
-    //Ordem aleatória das questões
+    //Questões da prova em ordem aleatória
     const QuestoesRandom = ArrayRandom(prova.questoes);
     QuestoesRandom.forEach((questao, index) => {
       doc
         .fontSize(12)
         .text(`${index + 1}) ${questao.questao_enunciado}`, { align: "left" });
-        //Alternativas de cada questão em ordem aleatória
-        if (questao.alternativas && questao.alternativas.length > 0) {
-          const RandomAlternativas = ArrayRandom(questao.alternativas);
-          RandomAlternativas.forEach((alternativa, index) => {
-            doc.text(
-              `${String.fromCharCode(97 + index)}) ${alternativa.enunciado}`,
-              { align: "left", indent: 20 }
-            );
-          });
-        }
 
-        // Adiciona a resposta correta da questão
-        doc.text(`Resposta correta: ${questao.questao_resposta}`, { align: 'left', indent: 20 });
+      //Alternativas de cada questão em ordem aleatória
+      if (questao.alternativas && questao.alternativas.length > 0) {
+        const RandomAlternativas = ArrayRandom(questao.alternativas);
+        RandomAlternativas.forEach((alternativa, index) => {
+          doc.text(
+            `${String.fromCharCode(97 + index)}) ${alternativa.enunciado}`,
+            { align: "left", indent: 20 }
+          );
+        });
+      }
+
+      // // Adiciona a resposta correta da questão
+      // doc.text(`Resposta correta: ${questao.questao_resposta}`, { align: 'left', indent: 20 });
 
       doc.moveDown(0.5);
     });
