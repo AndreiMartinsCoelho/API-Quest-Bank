@@ -22,18 +22,18 @@ ProvaRouter.post('/prova/adicionar', Middleware.verifyToken, async(req, res, nex
 })
 
 //Função para editar a prova
-ProvaRouter.put('/prova/atualizar/:id', ProvaController.editar, Middleware.verifyToken);
+ProvaRouter.put('/prova/atualizar/:id', Middleware.verifyToken, ProvaController.editar);
 
 //Função para excluir a prova
-ProvaRouter.delete('/prova/deletar/:id', ProvaController.excluir, Middleware.verifyToken);
+ProvaRouter.delete('/prova/deletar/:id', Middleware.verifyToken, ProvaController.excluir);
 
 //Função para obter uma prova específica pelo seu ID
-ProvaRouter.get('/prova/listar/:id', ProvaController.obterProva, Middleware.verifyToken);
+ProvaRouter.get('/prova/listar/:id', Middleware.verifyToken, ProvaController.obterProva);
 
 //Função para obter uma prova específica pelo enunciado
-ProvaRouter.get('/prova/buscar/:enunciado', ProvaController.buscarProvaPorEnunciado,Middleware.verifyToken);
+ProvaRouter.get('/prova/buscar/:enunciado', Middleware.verifyToken, ProvaController.buscarProvaPorEnunciado);
 
 //Função para gerar a prova em PDF
-ProvaRouter.get('/prova/download/:id', ProvaController.gerarProva, Middleware.verifyToken);
+ProvaRouter.get('/prova/download/:id', Middleware.verifyToken, ProvaController.gerarProva);
 
 module.exports = ProvaRouter;

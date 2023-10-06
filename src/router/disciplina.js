@@ -10,7 +10,7 @@ disciplinaRouter.get('/', Middleware.verifyToken, async (req, res, next) => {
 });
 
 //Função para listar disciplinas
-disciplinaRouter.get('/disciplina/listar',Middleware.verifyToken, async(req, res, next)=>{
+disciplinaRouter.get('/disciplina/listar', Middleware.verifyToken, async(req, res, next)=>{
     user = await disciplinaController.listar(req.body);
     res.status(200).send(user);
 })

@@ -9,7 +9,15 @@ module.exports = {
       const token = req.headers["x-access-token"];
       const perfil = req.headers["perfil"];
 
-      if (!token) {
+      if (!token || !perfil) {
+        return res.status(401).json({ auth: false, message: "Não autorizado" });
+      }
+
+      if(token === undefined || perfil === undefined){
+        return res.status(401).json({ auth: false, message: "Não autorizado" });
+      } else if (token === null || perfil === null) {
+        return res.status(401).json({ auth: false, message: "Não autorizado" });
+      } else if (token === "" || perfil === "") {
         return res.status(401).json({ auth: false, message: "Não autorizado" });
       }
 

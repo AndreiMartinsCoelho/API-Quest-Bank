@@ -22,15 +22,15 @@ QuestaoRouter.post('/questao/adicionar', Middleware.verifyToken, async(req, res,
 });
 
 //Função para editar a questão
-QuestaoRouter.put('/questao/atualizar/:id', QuestaoController.editar,Middleware.verifyToken);
+QuestaoRouter.put('/questao/atualizar/:id', Middleware.verifyToken, QuestaoController.editar);
 
 //Função para excluir a questão
-QuestaoRouter.delete('/questao/deletar/:id', QuestaoController.excluir,Middleware.verifyToken);
+QuestaoRouter.delete('/questao/deletar/:id', Middleware.verifyToken, QuestaoController.excluir);
 
 //Função para obter uma questão específica pelo seu ID
-QuestaoRouter.get('/questao/listar/:id', QuestaoController.obterQuestao,Middleware.verifyToken);
+QuestaoRouter.get('/questao/listar/:id', Middleware.verifyToken, QuestaoController.obterQuestao);
 
 //Função para obter uma questão específica pelo enunciado
-QuestaoRouter.get('/questao/buscar/:enunciado', QuestaoController.buscarQuestoesPorEnunciado,Middleware.verifyToken);
+QuestaoRouter.get('/questao/buscar/:enunciado', Middleware.verifyToken, QuestaoController.buscarQuestoesPorEnunciado);
 
 module.exports = QuestaoRouter;

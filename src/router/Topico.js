@@ -18,15 +18,15 @@ TopicoRouter.post('/topico/adicionar', Middleware.verifyToken, async(req, res, n
 });
 
 //Rota para excluir o tópico
-TopicoRouter.delete('/topico/deletar/:id', TopicoController.excluir,Middleware.verifyToken);
+TopicoRouter.delete('/topico/deletar/:id', Middleware.verifyToken, TopicoController.excluir);
 
 //Rota para atualizar o tópico
-TopicoRouter.put('/topico/atualizar/:id', TopicoController.editar,Middleware.verifyToken);
+TopicoRouter.put('/topico/atualizar/:id', Middleware.verifyToken, TopicoController.editar);
 
 //Rota para obter um tópico específico pelo seu ID
-TopicoRouter.get('/topico/listar/:id', TopicoController.listaId,Middleware.verifyToken);
+TopicoRouter.get('/topico/listar/:id', Middleware.verifyToken, TopicoController.listaId);
 
 //Rota para buscar um tópico pelo enunciado
-TopicoRouter.get('/topico/buscar/:enunciado', TopicoController.buscar,Middleware.verifyToken);
+TopicoRouter.get('/topico/buscar/:enunciado', Middleware.verifyToken,  TopicoController.buscar);
 
 module.exports = TopicoRouter;
