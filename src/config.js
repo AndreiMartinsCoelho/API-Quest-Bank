@@ -1,10 +1,4 @@
 module.exports = {
-    DB_HOST:'mysql.infocimol.com.br',
-    DB_USER:'infoCimol',
-    DB_PORT:'3306',
-    DB_PASSWORDS:'c1i2m3o4l5',
-    DB_DATABASE:'infocimol',
-
     async headers(){
         return [
           {
