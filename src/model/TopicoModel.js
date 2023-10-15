@@ -1,12 +1,18 @@
 const connection = require("./mysqlConnect").query();
 
 // Função para criar um tópico
-const criarTopico = async (enunciado, idDisciplina, idProfessor) => {
+const criarTopico = async (enunciado, disciplina, idProfessor) => {
   try {
     const novoIdTopico = await obterNovoIdTopico();
     const nomePessoa = await obterNomePessoa(idProfessor);
     const perfil = await obterPerfilUsuario(idProfessor);
-    const nomeDisciplina = await obterNomeDisciplina(idDisciplina);
+    let idDisciplina;
+
+    if (typeof disciplina === "string") {
+      idDisciplina = await obterIdDisciplinaPorNome(disciplina);
+    } else {
+      idDisciplina = disciplina;
+    }
 
     await new Promise((resolve, reject) => {
       connection.query(
@@ -32,7 +38,7 @@ const criarTopico = async (enunciado, idDisciplina, idProfessor) => {
       },
       disciplina: {
         id_disciplina: idDisciplina,
-        nome_disciplina: nomeDisciplina,
+        nome_disciplina: await obterNomeDisciplina(idDisciplina)
       },
     };
   } catch (error) {
