@@ -326,11 +326,10 @@ const gerarPDF = (prova) => {
   if (!prova || !prova.id_prova) {
     throw new Error("Prova inválida");
   }
-  const imagePath ="./src/model/img/logo.png.jpeg";
+  const imagePath ="./src/model/img/logo.jpeg";
   const nomeArquivo = `prova_${prova.id_prova}.pdf`;
   const stream = fs.createWriteStream(nomeArquivo);
   const doc = new PDFDocument();
-  const request = require("request");
   doc.info.Title = `Prova ${prova.id_prova}`;
 
   const larguraImagem = 35;
