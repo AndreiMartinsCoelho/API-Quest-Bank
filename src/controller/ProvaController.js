@@ -181,16 +181,18 @@ exports.gerarProva = async(req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+    
     const prova = await ProvaModel.obterProvaPorId(req.params.id);
 
     if (!prova) {
       return res.status(404).json({ error: 'Prova não encontrada' });
     }
+
     const gerarPDF = ProvaModel.gerarPDF;
     const nomeArquivo = gerarPDF(prova); // Chama a função gerarPDF sem usar o modelo
     
     res.setHeader('Content-Type', 'application/pdf'); // Define o tipo de conteúdo do arquivo PDF
-    res.send(nomeArquivo); // Envia o arquivo PDF para o cliente (browser)
+    res.setHeader('Content-Disposition', `attachment; filename=${nomeArquivo}`); // Define o nome do arquivo PDF
     res.download(nomeArquivo, (err) => {
       if (err) {
         console.error(err);
