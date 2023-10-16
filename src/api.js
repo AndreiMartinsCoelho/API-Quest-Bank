@@ -14,17 +14,6 @@ const {
     DB_PORT
 } = require('./config');
 
-exports.headers(async () =>{
-    return [
-      {
-        headers: [
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS, PUT, PATCH, DELETE' }
-        ],
-      },
-    ];
-})
-
 //--------------Rotas principais----------------//
 const userRouter = require('./router/user');
 app.use(userRouter);
