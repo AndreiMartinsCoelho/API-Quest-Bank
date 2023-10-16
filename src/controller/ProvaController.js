@@ -185,6 +185,7 @@ exports.gerarProva = async(req, res) => {
     const nomeArquivo = gerarPDF(prova); // Chama a função gerarPDF sem usar o modelo
     
     res.setHeader('Content-Type', 'application/pdf'); // Define o tipo de conteúdo do arquivo PDF
+    res.setHeader('Content-Disposition', `attachment; filename=${nomeArquivo}`); // Define o nome do arquivo PDF
     res.download(nomeArquivo, (err) => {
       if (err) {
         console.error(err);
