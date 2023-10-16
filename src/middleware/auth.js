@@ -1,14 +1,6 @@
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
 const userModel = require("../model/userModel");
-const cors = require('cors');
-
-const cors = require('cors');
-app.use(cors({
-  origin: '*', // permitir qualquer origem
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // permitir todos os métodos HTTP
-  allowedHeaders: ['x-access-token', 'perfil'] // permitir apenas esses cabeçalhos
-}));
 
 module.exports = {
   verifyToken: async (req, res, next) => {
