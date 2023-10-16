@@ -14,15 +14,6 @@ const {
     DB_PORT
 } = require('./config');
 
-//--------------CORS----------------//
-const cors = require('cors');
-app.use(cors({
-    origin: '*',
-    methods: 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-    allowedHeaders: 'X-Requested-With,content-type',
-    credentials: true
-}));
-
 //--------------Rotas principais----------------//
 const userRouter = require('./router/user');
 app.use(userRouter);
