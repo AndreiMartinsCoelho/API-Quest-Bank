@@ -12,11 +12,10 @@ const criar = (novaProva) => {
       }
 
       connection.query(
-        `INSERT INTO infocimol.prova (descricao, formato, tipo, professor_pessoa_id_pessoa, enunciado)
-        VALUES (?, ?, ?, ?, ?);`,
+        `INSERT INTO infocimol.prova (descricao, tipo, professor_pessoa_id_pessoa, enunciado)
+        VALUES (?, ?, ?, ?);`,
         [
           novaProva.descricao,
-          novaProva.formato,
           novaProva.tipo,
           novaProva.professorId,
           novaProva.enunciado,
@@ -59,7 +58,7 @@ const listar = (data) => {
   const { id } = data;
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
+      `SELECT p.id_prova, p.descricao, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
        FROM infocimol.prova p
        JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
        JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
@@ -75,7 +74,6 @@ const listar = (data) => {
               return {
                 id_prova: prova.id_prova,
                 enunciado: prova.enunciado,
-                formato: prova.formato,
                 tipo: prova.tipo,
                 criado_por: {
                   professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
@@ -186,7 +184,7 @@ const inserirQuestoes = (provaId, questoes) => {
 const get = () => {
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
+      `SELECT p.id_prova, p.descricao, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
         FROM infocimol.prova p
         JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
         JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
@@ -201,7 +199,6 @@ const get = () => {
               return {
                 id_prova: prova.id_prova,
                 enunciado: prova.enunciado,
-                formato: prova.formato,
                 tipo: prova.tipo,
                 criado_por: {
                   professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
@@ -244,7 +241,6 @@ const editarProva = (enunciado, descricao, tipo, idProva) => {
                 resolve({
                   id_prova: prova.id_prova,
                   enunciado: enunciado,
-                  formato: prova.formato,
                   tipo: tipo,
                   criado_por: prova.professor_pessoa_id_pessoa,
                   descricao: descricao,
@@ -292,7 +288,7 @@ const excluirProva = (idProva) => {
 const buscarProvaPorEnunciado = (enunciado) => {
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
+      `SELECT p.id_prova, p.descricao, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
         FROM infocimol.prova p
         JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
         JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
@@ -308,7 +304,6 @@ const buscarProvaPorEnunciado = (enunciado) => {
               return {
                 id_prova: prova.id_prova,
                 enunciado: prova.enunciado,
-                formato: prova.formato,
                 tipo: prova.tipo,
                 criado_por: {
                   professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
@@ -427,7 +422,7 @@ const obterProvaPorId = async (idProva) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
       connection.query(
-        `SELECT p.id_prova, p.descricao, p.formato, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
+        `SELECT p.id_prova, p.descricao, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
           FROM infocimol.prova p
           JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
           JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
@@ -446,7 +441,6 @@ const obterProvaPorId = async (idProva) => {
     const prova = resultados.map((prova) => ({
       id_prova: prova.id_prova,
       enunciado: prova.enunciado,
-      formato: prova.formato,
       tipo: prova.tipo,
       criado_por: {
         professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
