@@ -9,7 +9,7 @@ module.exports = {
               { key: 'Access-Control-Allow-Headers', value: 'X-Requested-With,content-type' },
               { key: 'Access-Control-Allow-Credentials', value: true },
               { key: 'x-access-token', value: 'true'},
-              { key: 'perfil', value: 'admin'}
+              { key: 'perfil', value: 'admin', value: 'professor'}
             ],
           },
         ];
