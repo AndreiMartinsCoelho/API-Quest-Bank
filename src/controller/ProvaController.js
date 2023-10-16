@@ -174,25 +174,32 @@ exports.buscarProvaPorEnunciado = async (req, res) => {
 };
 
 //Função para gerar a prova em PDF
-exports.gerarProva = async(req, res) => {
+exports.gerarProva = async (req, res) => {
   try {
     const prova = await ProvaModel.obterProvaPorId(req.params.id);
 
     if (!prova) {
       return res.status(404).json({ error: 'Prova não encontrada' });
     }
+
     const gerarPDF = ProvaModel.gerarPDF;
-    const nomeArquivo = gerarPDF(prova); // Chama a função gerarPDF sem usar o modelo
-    
-    res.setHeader('Content-Type', 'application/pdf'); // Define o tipo de conteúdo do arquivo PDF
-    res.setHeader('Content-Disposition', `attachment; filename=${nomeArquivo}`); // Define o nome do arquivo PDF
-    res.download(nomeArquivo, (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Erro ao baixar o arquivo' });
-      }
-    
-      fs.unlinkSync(nomeArquivo);
+    const nomeArquivo = gerarPDF(prova);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${nomeArquivo}`);
+    const stream = fs.createReadStream(nomeArquivo);
+
+    stream.on('open', () => {
+      stream.pipe(res);
+    });
+
+    stream.on('end', () => {
+      fs.unlinkSync(nomeArquivo); // Remova o arquivo após o envio
+    });
+
+    stream.on('error', (err) => {
+      console.error(err);
+      res.status(500).json({ error: 'Erro ao enviar o arquivo PDF' });
     });
   } catch (err) {
     console.error(err);
