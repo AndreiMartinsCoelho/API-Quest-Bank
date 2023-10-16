@@ -179,6 +179,8 @@ exports.gerarProva = async(req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'https://quest-bank.vercel.app');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
     const prova = await ProvaModel.obterProvaPorId(req.params.id);
 
     if (!prova) {
