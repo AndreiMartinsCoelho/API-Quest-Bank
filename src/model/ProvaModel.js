@@ -331,36 +331,49 @@ const gerarPDF = (prova) => {
   if (!prova || !prova.id_prova) {
     throw new Error("Prova inválida");
   }
-
+  const imagePath ="./src/model/img/logo.png.jpeg";
   const nomeArquivo = `prova_${prova.id_prova}.pdf`;
   const stream = fs.createWriteStream(nomeArquivo);
   const doc = new PDFDocument();
-
+  const request = require("request");
   doc.info.Title = `Prova ${prova.id_prova}`;
 
-  // Adiciona o cabeçalho
-  // doc.image('caminho_para_seu_logo.png', 50, 45, { width: 50 })
+  const larguraImagem = 35;
+
+  const yPos = doc.y + 20;
+
+  doc.image(imagePath, 50, yPos, { width: larguraImagem });
+
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(16)
+    .text(
+      "ESCOLA TÉCNICA ESTADUAL MONTEIRO LOBATO",
+      50 + larguraImagem + 15,
+      yPos
+    );
+  if (prova.questoes && prova.questoes.length > 0) {
+    const QuestoesRandom = ArrayRandom(prova.questoes);
+    QuestoesRandom.forEach((questao, index) => {
+      doc
+        .font("Helvetica")
+        .fontSize(12)
+        .text(
+          `${questao.topicos.disciplina.questao_topico_disciplina_nome} - ${prova.criado_por.professor_nome}`,
+          50 + larguraImagem + 15,
+          doc.y + 10
+        );
+    });
+  }
+
   doc
     .font("Helvetica-Bold")
     .fontSize(12)
-    .text("Nome da Sua Instituição", 110, 50)
-    .fontSize(10)
-    .text("Endereço da Instituição", 200, 50, { align: "right" })
-    .text("Telefone: (11) 1234-5678", 200, 65, { align: "right" })
-    .text("Email: instituicao@exemplo.com", 200, 80, { align: "right" })
-    .moveDown();
-
-  // Adiciona o enunciado da prova
+    .text(`Orientações`, 50, doc.y + 20);
   doc
     .font("Helvetica")
-    .fontSize(14)
-    .text(`Enunciado: ${prova.enunciado}`, { align: "left" })
-    .moveDown(0.5);
-
-  // Adiciona a descrição da prova
-  doc
     .fontSize(12)
-    .text(`Descrição: ${prova.descricao}`, { align: "left" })
+    .text(`${prova.descricao}`, { align: "left" })
     .moveDown(0.5);
 
   //Array que armazena as questões da prova em ordem aleatória
@@ -378,6 +391,7 @@ const gerarPDF = (prova) => {
     const QuestoesRandom = ArrayRandom(prova.questoes);
     QuestoesRandom.forEach((questao, index) => {
       doc
+        .font("Helvetica")
         .fontSize(12)
         .text(`${index + 1}) ${questao.questao_enunciado}`, { align: "left" });
 
@@ -393,16 +407,10 @@ const gerarPDF = (prova) => {
       }
 
       // // Adiciona a resposta correta da questão
-      // doc.text(`Resposta correta: ${questao.questao_resposta}`, { align: 'left', indent: 20 });
 
       doc.moveDown(0.5);
     });
   }
-
-  // Adiciona o rodapé
-  doc
-    .fontSize(8)
-    .text("Página 1 de 1", 50, doc.page.height - 50, { align: "center" });
 
   stream.on("finish", () => {
     console.log(`Arquivo ${nomeArquivo} gerado com sucesso`);
