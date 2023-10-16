@@ -6,7 +6,13 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const { headers } = require('./config');
+const {
+    DB_HOST,
+    DB_USER,
+    DB_USER_PASS,
+    DB_DATEBASE,
+    DB_PORT
+} = require('./config');
 
 //--------------Rotas principais----------------//
 const userRouter = require('./router/user');
@@ -74,4 +80,4 @@ app.use(routerProva);
 // const config = require('./config');
 // app.use(config);
 
-module.exports = app, headers;
+module.exports = app;
