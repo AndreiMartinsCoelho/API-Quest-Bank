@@ -185,10 +185,6 @@ exports.gerarProva = async(req, res) => {
     const nomeArquivo = gerarPDF(prova); // Chama a função gerarPDF sem usar o modelo
     
     res.setHeader('Access-Control-Allow-Origin', 'https://quest-bank.vercel.app');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
     res.setHeader('Content-Type', 'application/pdf'); // Define o tipo de conteúdo do arquivo PDF
     res.download(nomeArquivo, (err) => {
       if (err) {
