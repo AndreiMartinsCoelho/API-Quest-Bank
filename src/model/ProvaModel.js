@@ -390,12 +390,6 @@ const gerarPDF = (prova) => {
   return nomeArquivo;
 };
 
-try {
-  gerarPDF(prova);
-} catch (err) {
-  console.error(`Erro ao gerar PDF: ${err.message}`);
-}
-
 //Função para obter uma prova específico pelo seu ID
 const obterProvaPorId = async (idProva) => {
   try {
