@@ -327,7 +327,7 @@ const gerarPDF = (prova) => {
     throw new Error("Prova inválida");
   }
   const imagePath ="./src/model/img/logo.jpeg";
-  const nomeArquivo = `prova_${prova.id_prova}.pdf`;
+  // const nomeArquivo = `prova_${prova.id_prova}.pdf`;
   const stream = fs.createWriteStream(nomeArquivo);
   const doc = new PDFDocument();
   doc.info.Title = `Prova ${prova.id_prova}`;
@@ -336,7 +336,7 @@ const gerarPDF = (prova) => {
 
   const yPos = doc.y + 20;
 
-  doc.image(imagePath, 50, yPos, { width: larguraImagem });
+  // doc.image(imagePath, 50, yPos, { width: larguraImagem });
 
   doc
     .font("Helvetica-Bold")
