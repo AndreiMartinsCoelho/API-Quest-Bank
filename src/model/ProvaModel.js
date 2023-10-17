@@ -326,6 +326,7 @@ const gerarPDF = (prova) => {
   if (!prova || !prova.id_prova) {
     throw new Error("Prova inválida");
   }
+  const imagePath ="./src/model/img/logo.jpeg";
   const nomeArquivo = `prova_${prova.id_prova}.pdf`;
   const stream = fs.createWriteStream(nomeArquivo);
   const doc = new PDFDocument();
@@ -334,6 +335,8 @@ const gerarPDF = (prova) => {
   const larguraImagem = 35;
 
   const yPos = doc.y + 20;
+
+  doc.image(imagePath, 50, yPos, { width: larguraImagem });
 
   doc
     .font("Helvetica-Bold")
@@ -376,12 +379,35 @@ const gerarPDF = (prova) => {
     return array;
   }
 
+  // Adiciona as questões da prova
+  if (prova.questoes && prova.questoes.length > 0) {
+    //Questões da prova em ordem aleatória
+    const QuestoesRandom = ArrayRandom(prova.questoes);
+    QuestoesRandom.forEach((questao, index) => {
+      doc
+        .font("Helvetica")
+        .fontSize(12)
+        .text(`${index + 1}) ${questao.questao_enunciado}`, { align: "left" });
+
+      //Alternativas de cada questão em ordem aleatória
+      if (questao.alternativas && questao.alternativas.length > 0) {
+        const RandomAlternativas = ArrayRandom(questao.alternativas);
+        RandomAlternativas.forEach((alternativa, index) => {
+          doc.text(
+            `${String.fromCharCode(97 + index)}) ${alternativa.enunciado}`,
+            { align: "left", indent: 20 }
+          );
+        });
+      }
+
+      // // Adiciona a resposta correta da questão
+
+      doc.moveDown(0.5);
+    });
+  }
+
   stream.on("finish", () => {
     console.log(`Arquivo ${nomeArquivo} gerado com sucesso`);
-  });
-
-  stream.on("error", (err) => {
-    console.error(`Erro ao criar arquivo ${nomeArquivo}: ${err.message}`);
   });
 
   doc.pipe(stream);
