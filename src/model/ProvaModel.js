@@ -326,7 +326,6 @@ const gerarPDF = (prova) => {
   if (!prova || !prova.id_prova) {
     throw new Error("Prova inválida");
   }
-  // const imagePath ="./src/model/img/logo.jpeg";
   const nomeArquivo = `prova_${prova.id_prova}.pdf`;
   const stream = fs.createWriteStream(nomeArquivo);
   const doc = new PDFDocument();
@@ -335,8 +334,6 @@ const gerarPDF = (prova) => {
   const larguraImagem = 35;
 
   const yPos = doc.y + 20;
-
-  // doc.image(imagePath, 50, yPos, { width: larguraImagem });
 
   doc
     .font("Helvetica-Bold")
@@ -400,14 +397,16 @@ const gerarPDF = (prova) => {
         });
       }
 
-      // // Adiciona a resposta correta da questão
-
       doc.moveDown(0.5);
     });
   }
 
   stream.on("finish", () => {
     console.log(`Arquivo ${nomeArquivo} gerado com sucesso`);
+  });
+
+  stream.on("error", (err) => {
+    console.error(`Erro ao criar arquivo ${nomeArquivo}: ${err.message}`);
   });
 
   doc.pipe(stream);
