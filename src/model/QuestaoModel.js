@@ -1,4 +1,6 @@
 const connection = require("./mysqlConnect").query();
+const fs = require("fs");
+const path = require("path");
 
 // Função para obter todas as questões
 const get = (idProfessor) => {
@@ -153,6 +155,15 @@ const create = (data) => {
                 }
                 const novoIdQuestao = result.insertId;
 
+                // Save the image to the src/public/image folder
+                const imgPath = path.join(__dirname, "../public/image");
+                if (!fs.existsSync(imgPath)) {
+                  fs.mkdirSync(imgPath, { recursive: true });
+                }
+                const imgName = `${novoIdQuestao}.jpg`;
+                const imgFullPath = path.join(imgPath, imgName);
+                fs.writeFileSync(imgFullPath, Enunciado_imagem, "binary");
+
                 resolve(novoIdQuestao); // Resolve com o ID da nova questão
               }
             );
@@ -162,7 +173,6 @@ const create = (data) => {
     );
   });
 };
-
 // Função para obter detalhes de uma questão por ID
 const getQuestionDetails = (idQuestao) => {
   return new Promise((resolve, reject) => {
