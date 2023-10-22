@@ -1,7 +1,7 @@
 const connection = require("./mysqlConnect").query();
 
 // Função para obter todas as questões
-const get = () => {
+const get = (idProfessor) => {
   return new Promise((resolve, reject) => {
     connection.query(
       `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, t.disciplina_id_disciplina, d.nome AS disciplina_nome, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
@@ -12,7 +12,9 @@ const get = () => {
           JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
           JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
           LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao
+          WHERE q.professor_pessoa_id_pessoa = ?
           ORDER BY q.id_questao ASC`,
+      [idProfessor],
       (error, results) => {
         if (error) {
           reject(error);

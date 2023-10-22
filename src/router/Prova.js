@@ -3,17 +3,8 @@ const ProvaRouter = express.Router();
 const ProvaController = require('../controller/ProvaController');
 const Middleware = require('../middleware/auth');
 
-//Função para obter a prova
-ProvaRouter.get('/', Middleware.verifyToken, async (req, res, next) => {
-    user = await ProvaController.get(req.headers);
-    res.status(200).send(user);
-});
-
 //Função para listar a prova
-ProvaRouter.get('/prova/listar', Middleware.verifyToken, async(req, res, next)=>{
-    user=await ProvaController.listar(req.body);
-    res.status(200).send(user);
-});
+ProvaRouter.get('/prova/listar', Middleware.verifyToken, ProvaController.listar);
 
 //Função para criar a prova
 ProvaRouter.post('/prova/adicionar', Middleware.verifyToken, async(req, res, next)=>{
@@ -34,6 +25,6 @@ ProvaRouter.get('/prova/listar/:id', Middleware.verifyToken, ProvaController.obt
 ProvaRouter.get('/prova/buscar/:enunciado', Middleware.verifyToken, ProvaController.buscarProvaPorEnunciado);
 
 //Função para gerar a prova em PDF
-ProvaRouter.get('/prova/download/:id', ProvaController.gerarProva);
+ProvaRouter.get('/prova/download/:id', Middleware.verifyToken, ProvaController.gerarProva);
 
 module.exports = ProvaRouter;
