@@ -3,12 +3,6 @@ const AlternativasRouter = express.Router();
 const AlternativasController = require('../controller/AlternativasController');
 const Middleware = require('../middleware/auth');
 
-//Função para obter alternativas
-AlternativasRouter.get('/', Middleware.verifyToken, async (req, res, next) => {
-    user = await AlternativasController.get(req.headers);
-    res.status(200).send(user);
-});
-
 //Função para listar alternativas
 AlternativasRouter.get('/alternativa/listar', Middleware.verifyToken, async(req, res, next)=>{
     user=await AlternativasController.listar(req.body);

@@ -156,50 +156,6 @@ const obterNovoIdAlternativa = async () => {
   }
 };
 
-//Função para listar as alternativas
-const list = (data) => {
-  const { id } = data;
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT q.id_questao, q.nivel, q.tipo, q.enunciado AS questao_enunciado, q.enunciado_imagem AS questao_enunciado_imagem, a.enunciado AS enunciado, t.id_topico, t.enunciado AS topico_enunciado, d.id_disciplina, d.nome AS disciplina_nome
-      FROM infocimol.alternativa a
-      JOIN questao q ON a.questao_id_questao = q.id_questao
-      JOIN topico t ON q.topico_id_topico = t.id_topico
-      JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
-      ORDER By a.id_alternativa DESC`,
-      [id],
-      (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          const alternativas = results.map((alternativa) => ({
-            id_alternativa: alternativa.id_alternativa,
-            enunciado: alternativa.enunciado,
-            correta: alternativa.correta,
-            questao: {
-              id_questao: alternativa.id_questao,
-              enunciado: alternativa.questao_enunciado,
-              enunciado_imagem: alternativa.questao_enunciado_imagem,
-              resposta: alternativa.resposta,
-              nivel: alternativa.nivel,
-              tipo: alternativa.tipo,
-            },
-            topico: {
-              id_topico: alternativa.id_topico,
-              enunciado: alternativa.topico_enunciado,
-              disciplina: {
-                id_disciplina: alternativa.id_disciplina,
-                nome: alternativa.disciplina_nome,
-              },
-            },
-          }));
-          resolve(alternativas);
-        }
-      }
-    );
-  });
-};
-
 //Função para editar uma alternativa
 const editarAlternativa = async (enunciado, correta, idAlternativa) => {
   try {
@@ -346,7 +302,6 @@ module.exports = {
   obterIdQuestaoPorEnunciado,
   obterNovoIdAlternativa,
   get,
-  list,
   editarAlternativa,
   excluirAlternativa,
   obterAlternativaPorId,

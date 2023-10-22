@@ -1,40 +1,22 @@
 const ProvaModel = require("../model/ProvaModel");
 const fs = require('fs');
 
-//Função para obter as provas
-exports.get = async (headers) => {
-  try {
-    const provas = await ProvaModel.get();
-    return {
-      status: "success",
-      msg: "Provas obtidas com sucesso...",
-      provas,
-    };
-  } catch (error) {
-    // Tratar erro caso ocorra na consulta ao banco de dados
-    console.error("Erro ao obter Provas:", error);
-    return {
-      status: "error",
-      msg: "Ops! Ocorreu um erro ao obter as provas...",
-    };
-  }
-};
-
 //Função para listar as provas
-exports.listar = async (body) => {
-  const result = await ProvaModel.listar(body);
-  if (result.auth) {
-    return {
+exports.listar = async (req, res) => {
+  const idProfessor = req.query.idProfessor;
+  try {
+    const provas = await ProvaModel.listar(idProfessor);
+    res.status(200).json({
       status: "success",
       msg: "Provas listadas com sucesso...",
-      provas: result.provas,
-    };
-  } else {
-    // Tratar caso em que não há autenticação
-    return {
+      provas: provas,
+    });
+  } catch (error) {
+    console.error("Erro ao listar Provas:", error);
+    res.status(500).json({
       status: "error",
       msg: "Ops! Ocorreu algum erro...",
-    };
+    });
   }
 };
 

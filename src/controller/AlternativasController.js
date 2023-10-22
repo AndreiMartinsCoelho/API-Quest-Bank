@@ -1,35 +1,15 @@
 const AlternativasModel = require("../model/AlternativasModel");
 
-//Função para obter as alternativas
-exports.get = async (headers) => {
-  try {
-    const alternativas = await AlternativasModel.get();
-    return {
-      status: "success",
-      msg: "Alternativas obtidas com sucesso...",
-      alternativas,
-    };
-  } catch (error) {
-    // Tratar erro caso ocorra na consulta ao banco de dados
-    console.error("Erro ao obter alternativas...", error);
-    return {
-      status: "error",
-      msg: "Ocorreu algum erro ao obter as alternativas...",
-    };
-  }
-};
-
 //Função para listar as alternativas
 exports.listar = async (body) => {
-  const result = await AlternativasModel.list(body);
-  if (result.auth) {
+  const result = await AlternativasModel.get(body);
+  if (result) {
     return {
       status: "success",
       msg: "Alternativas obtidas com sucesso...",
-      alternativas: result.alternativas,
+      alternativas: result,
     };
   } else {
-    // Tratar caso em que não há autenticação
     return {
       status: "error",
       msg: "Ops! Você não está autenticado...",

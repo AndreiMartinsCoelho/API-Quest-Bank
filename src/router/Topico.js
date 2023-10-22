@@ -4,11 +4,7 @@ const TopicoController = require('../controller/TopicosController');
 const Middleware = require('../middleware/auth');
 
 //Rota para listar o tópico
-TopicoRouter.get('/topico/listar', Middleware.verifyToken, async(req, res, next)=>{
-    const { idProfessor } = req.query;
-    const user = await TopicoController.get(req.body, { idProfessor });
-    res.status(200).send(user);
-});
+TopicoRouter.get('/topico/listar', Middleware.verifyToken, TopicoController.get);
 
 //Rota para criar o tópico
 TopicoRouter.post('/topico/adicionar', Middleware.verifyToken, async(req, res, next) => {

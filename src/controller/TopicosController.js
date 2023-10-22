@@ -53,16 +53,19 @@ exports.criar = async (data) => {
 };
 
 //Função para obter todos os tópicos
-exports.get = async () => {
+exports.get = async (req, res) => {
+  const idProfessor = req.query.idProfessor;
   try {
-    const topicos = await TopicoModel.obterTodosOsTopicos();
-    return { status: "success", msg: "Tópicos obtidos com sucesso!", topicos };
+    res.status(200).json({
+      status: "success",
+      msg: "Tópicos obtidos com sucesso!",
+      topicos: await TopicoModel.obterTodosOsTopicos(idProfessor),
+    })
   } catch (error) {
-    console.error("Erro ao pegar os tópicos:", error);
-    return {
+    res.status(500).json({
       status: "error",
-      msg: "Ops! Ocorreu um erro fatal ao obter os tópicos...",
-    };
+      msg: "Ops! Ocorreu um erro ao obter os tópicos...",
+    });
   }
 };
 

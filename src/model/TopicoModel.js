@@ -93,7 +93,7 @@ const obterIdDisciplinaPorNome = async (nomeDisciplina) => {
 };
 
 // Função para obter todos os tópicos
-const obterTodosOsTopicos = async () => {
+const obterTodosOsTopicos = async (idProfessor) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
       connection.query(
@@ -104,7 +104,9 @@ const obterTodosOsTopicos = async () => {
           JOIN pessoa p ON t.professor_pessoa_id_pessoa = p.id_pessoa
           JOIN usuario u ON p.id_pessoa = u.pessoa_id_pessoa
           JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+          WHERE t.professor_pessoa_id_pessoa = ?
           ORDER BY t.id_topico DESC`,
+        [idProfessor],
         (error, resultados) => {
           if (error) {
             resolve(null); // Retorna null em caso de erro

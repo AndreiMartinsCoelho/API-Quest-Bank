@@ -3,17 +3,8 @@ const QuestaoRouter = express.Router();
 const QuestaoController = require('../controller/QuestaoController');
 const Middleware = require('../middleware/auth');
 
-//Função para obter a questão
-QuestaoRouter.get('/', Middleware.verifyToken, async (req, res, next) => {
-    user = await QuestaoController.get(req.headers);
-    res.status(200).send(user);
-});
-
-//Função para listar a questão
-QuestaoRouter.get('/questao/listar', Middleware.verifyToken,async(req, res, next)=>{
-    user = await QuestaoController.listar(req.body);
-    res.status(200).send(user);
-});
+//Função para obter as questões
+QuestaoRouter.get('/questao/listar', Middleware.verifyToken, QuestaoController.get);
 
 //Função para criar a questão
 QuestaoRouter.post('/questao/adicionar', Middleware.verifyToken, async(req, res, next)=>{

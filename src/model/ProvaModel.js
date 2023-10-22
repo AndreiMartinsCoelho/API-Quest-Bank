@@ -54,16 +54,16 @@ const criar = (novaProva) => {
 };
 
 //Função para obter as prova
-const listar = (data) => {
-  const { id } = data;
+const listar = (idProfessor) => {
   return new Promise((resolve, reject) => {
     connection.query(
       `SELECT p.id_prova, p.descricao, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
        FROM infocimol.prova p
        JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
        JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
+       WHERE p.professor_pessoa_id_pessoa = ?
        ORDER BY p.id_prova DESC`,
-      [id],
+      [idProfessor],
       async (error, results) => {
         if (error) {
           reject(error);
@@ -90,6 +90,7 @@ const listar = (data) => {
     );
   });
 };
+
 
 //Função para obter as questões de uma prova
 const getQuestoes = (provaId) => {
@@ -177,42 +178,6 @@ const inserirQuestoes = (provaId, questoes) => {
         resolve(result);
       }
     });
-  });
-};
-
-//Função para obter as provas
-const get = () => {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT p.id_prova, p.descricao, p.tipo, p.professor_pessoa_id_pessoa, p.enunciado, pp.nome AS professor_nome
-        FROM infocimol.prova p
-        JOIN pessoa pp ON p.professor_pessoa_id_pessoa = pp.id_pessoa
-        JOIN usuario up ON pp.id_pessoa = up.pessoa_id_pessoa
-        ORDER BY p.id_prova DESC`,
-      async (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          const provas = await Promise.all(
-            results.map(async (prova) => {
-              const questoes = await getQuestoes(prova.id_prova);
-              return {
-                id_prova: prova.id_prova,
-                enunciado: prova.enunciado,
-                tipo: prova.tipo,
-                criado_por: {
-                  professor_pessoa_id_pessoa: prova.professor_pessoa_id_pessoa,
-                  professor_nome: prova.professor_nome,
-                },
-                descricao: prova.descricao,
-                questoes: questoes,
-              };
-            })
-          );
-          resolve(provas);
-        }
-      }
-    );
   });
 };
 
@@ -456,7 +421,6 @@ const obterProvaPorId = async (idProva) => {
 };
 
 module.exports = {
-  get,
   criar,
   listar,
   getQuestoes,
