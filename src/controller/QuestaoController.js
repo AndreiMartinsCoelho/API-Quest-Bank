@@ -19,6 +19,23 @@ exports.get = async (req, res) => {
   }
 };
 
+exports.getQuestoes = async (req,res)=>{
+  const questoes = await QuestaoModel.getQuestoes();
+  try{
+    res.status(200).json({
+      status: "success",
+      msg: "Questões obtidas com sucesso...",
+      questoes: questoes,
+    });
+  }catch(error){
+    console.error("Erro ao listar as questões:", error);
+    res.status(500).json({
+      status: "error",
+      msg: "Ops! Ocorreu algum erro...",
+    });
+  }
+}
+
 //Função para criar a questão
 exports.criar = async (body) => {
   try {

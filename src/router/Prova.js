@@ -6,6 +6,9 @@ const Middleware = require('../middleware/auth');
 //Função para listar a prova
 ProvaRouter.get('/prova/listar', Middleware.verifyToken, ProvaController.listar);
 
+//Função para listar as provas sem idProfessor
+ProvaRouter.get('/provas/listar', Middleware.verifyToken, ProvaController.listarProvas);
+
 //Função para criar a prova
 ProvaRouter.post('/prova/adicionar', Middleware.verifyToken, async(req, res, next)=>{
     user=await ProvaController.criar(req.body);

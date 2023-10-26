@@ -84,6 +84,87 @@ const get = (idProfessor) => {
   })
 };
 
+// Função para obter todas as questões
+const getQuestoes = (id) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, t.disciplina_id_disciplina, d.nome AS disciplina_nome, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
+          a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
+          FROM infocimol.questao q
+          JOIN topico t ON q.topico_id_topico = t.id_topico
+          JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+          JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+          JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+          LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao
+          ORDER BY q.id_questao ASC`,
+          [id],
+      (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          const questoes = {};
+          results.forEach((row) => {
+            const {
+              id_questao,
+              enunciado,
+              Enunciado_imagem,
+              tipo,
+              nivel,
+              resposta,
+              professor_nome,
+              professor_pessoa_id_pessoa,
+              topico_id_topico,
+              topico_enunciado,
+              disciplina_id_disciplina,
+              disciplina_nome,
+              id_alternativa,
+              correta,
+              alternativa_enunciado,
+            } = row;
+
+            if (!questoes[id_questao]) {
+              questoes[id_questao] = {
+                id_questao,
+                enunciado,
+                Enunciado_imagem,
+                tipo,
+                nivel,
+                resposta,
+                professor: {
+                  professor_id_professor: professor_pessoa_id_pessoa,
+                  professor_nome,
+                },
+                topico: {
+                  topico_id_topico,
+                  topico_enunciado,
+                  disciplina: {
+                    disciplina_id_disciplina,
+                    disciplina_nome,
+                  },
+                },
+                alternativas: [],
+              };
+            }
+
+            if (id_alternativa) {
+              questoes[id_questao].alternativas.push({
+                id_alternativa,
+                correta,
+                enunciado: alternativa_enunciado,
+              });
+            }
+          });
+
+          //Ordena as questões por ID de forma decrescente (da mais nova para a mais antiga) e resolve a Promise com o array de questões          
+          const listaQuestoes = Object.values(questoes);
+          listaQuestoes.sort((a, b) => b.id_questao - a.id_questao);
+          resolve(Object.values(listaQuestoes));
+        }
+      }
+    );
+  })
+};
+
 // Função para criar uma nova questão
 const create = (data) => {
   return new Promise((resolve, reject) => {
@@ -155,15 +236,6 @@ const create = (data) => {
                 }
                 const novoIdQuestao = result.insertId;
 
-                // Save the image to the src/public/image folder
-                const imgPath = path.join(__dirname, "../public/image");
-                if (!fs.existsSync(imgPath)) {
-                  fs.mkdirSync(imgPath, { recursive: true });
-                }
-                const imgName = `${novoIdQuestao}.jpg`;
-                const imgFullPath = path.join(imgPath, imgName);
-                fs.writeFileSync(imgFullPath, Enunciado_imagem, "binary");
-
                 resolve(novoIdQuestao); // Resolve com o ID da nova questão
               }
             );
@@ -173,6 +245,7 @@ const create = (data) => {
     );
   });
 };
+
 // Função para obter detalhes de uma questão por ID
 const getQuestionDetails = (idQuestao) => {
   return new Promise((resolve, reject) => {
@@ -410,4 +483,5 @@ module.exports = {
   verQuestao,
   getAlternativas,
   buscarQuestoesPorEnunciado,
+  getQuestoes
 };
