@@ -145,6 +145,58 @@ const obterTodosOsTopicos = async (idProfessor) => {
   }
 };
 
+// Função para obter todos os tópicos
+const getTopicos = async (id) => {
+  try {
+    const resultados = await new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT t.id_topico, t.enunciado, p.id_pessoa, p.nome AS nome_pessoa, t.professor_pessoa_id_pessoa,
+          p.id_pessoa AS "usuario.pesosa_id_pessoa", u.perfil AS "usuario.perfil",
+          d.id_disciplina AS "disciplina.id_disciplina", d.nome AS "disciplina.nome_disciplina"
+          FROM topico t
+          JOIN pessoa p ON t.professor_pessoa_id_pessoa = p.id_pessoa
+          JOIN usuario u ON p.id_pessoa = u.pessoa_id_pessoa
+          JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+          ORDER BY t.id_topico DESC`,
+        [id],
+        (error, resultados) => {
+          if (error) {
+            resolve(null); // Retorna null em caso de erro
+          } else {
+            resolve(resultados);
+          }
+        }
+      );
+    });
+
+    const topicos = [];
+
+    for (let i = 0; i < resultados.length; i++) {
+      const nomePessoa = await obterNomePessoa(resultados[i].professor_pessoa_id_pessoa);
+
+      const topico = {
+        id_topico: resultados[i].id_topico,
+        enunciado: resultados[i].enunciado,
+        usuario: {
+          id_pessoa: resultados[i].professor_pessoa_id_pessoa,
+          nome_pessoa: nomePessoa,
+          perfil: resultados[i]["usuario.perfil"],
+        },
+        disciplina: {
+          id_disciplina: resultados[i]["disciplina.id_disciplina"],
+          nome_disciplina: resultados[i]["disciplina.nome_disciplina"],
+        },
+      };
+
+      topicos.push(topico);
+    }
+
+    return topicos;
+  } catch (error) {
+    return null; // Retorna null em caso de erro
+  }
+};
+
 // Função para obter o próximo id do tópico
 const obterNovoIdTopico = async () => {
   try {
@@ -356,5 +408,6 @@ module.exports = {
   editar,
   obterTopicoPorId,
   obterNomeDisciplina,
-  obterTopicoPorEnunciado
+  obterTopicoPorEnunciado,
+  getTopicos
 };

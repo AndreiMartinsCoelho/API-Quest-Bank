@@ -69,6 +69,23 @@ exports.get = async (req, res) => {
   }
 };
 
+//Função para obter todos os tópicos sem filtro
+exports.getTodosTopicos = async (req, res) => {
+  const topicos = await TopicoModel.getTopicos();
+  try{
+    res.status(200).json({
+      status:"sucess",
+      msg:"Tópicos obtidos com sucesso!",
+      topicos: topicos
+    })
+  }catch(error){
+    res.status(500).json({
+      status: "error",
+      msg:"Ops! Ocorreu um erro ao obter os tópicos..."
+    });
+  }
+}
+
 //Função para excluir o tópico
 exports.excluir = async (req, res) => {
   const idTopico = req.params.id; // Extrai o ID da URL

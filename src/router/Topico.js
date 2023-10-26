@@ -6,6 +6,9 @@ const Middleware = require('../middleware/auth');
 //Rota para listar o tópico
 TopicoRouter.get('/topico/listar', Middleware.verifyToken, TopicoController.get);
 
+//Rota para listar todos os tópicos sem idProfessor
+TopicoRouter.get('/topicos/listar', Middleware.verifyToken, TopicoController.getTodosTopicos);
+
 //Rota para criar o tópico
 TopicoRouter.post('/topico/adicionar', Middleware.verifyToken, async(req, res, next) => {
     const data = req.body;

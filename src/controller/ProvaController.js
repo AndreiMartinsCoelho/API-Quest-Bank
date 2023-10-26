@@ -20,6 +20,23 @@ exports.listar = async (req, res) => {
   }
 };
 
+//Função para listar as provas sem filtro
+exports.listarProvas = async (req, res) => {
+  const provas = await ProvaModel.getProvas();
+  try{
+    res.status(200).json({
+      status:"success",
+      msg:"Provas listadas com sucesso...",
+      provas: provas
+    })
+  }catch(error){
+    res.status(500).json({
+      status:"error",
+      msg:"Ops! Ocorreu algum erro..."
+    })
+  }
+};
+
 //Função para criar a prova
 exports.criar = async (body) => {
   const result = await ProvaModel.criar(body);

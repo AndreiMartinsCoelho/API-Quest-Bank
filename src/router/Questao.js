@@ -6,6 +6,9 @@ const Middleware = require('../middleware/auth');
 //Função para obter as questões
 QuestaoRouter.get('/questao/listar', Middleware.verifyToken, QuestaoController.get);
 
+//Função para obter as questões
+QuestaoRouter.get('/questoes/listar', Middleware.verifyToken, QuestaoController.getQuestoes);
+
 //Função para criar a questão
 QuestaoRouter.post('/questao/adicionar', Middleware.verifyToken, async(req, res, next)=>{
     user=await QuestaoController.criar(req.body);
