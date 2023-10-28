@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
 const connection = require("./mysqlConnect").query();
+const nodemailer = require("nodemailer");
 
 // Função para buscar todos os usuários
 const get = async () => {
@@ -106,12 +107,41 @@ const verifyJWT = async (token, perfil) => {
   } catch (err) {
     return { auth: false, message: "Token inválido!" };
   }
-}; 
+};
 
-// Função para trocar a senha do usuário
-const changePassword = async (data) => {
+// Função para enviar o e-mail com o código de verificação
+const sendVerificationCode = async (email) => {
+  const codigo = process.env.VERIFICATION_CODE;
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
+    },
+  });
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: "Código de verificação",
+    text: `Seu código de verificação é ${codigo}. Use-o para alterar sua senha.`,
+  };
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        reject(error);
+      } else {
+        console.log("E-mail enviado: " + info.response);
+        resolve(codigo);
+      }
+    });
+  });
+};
+
+// Função para atualizar a senha do usuário
+const updatePassword = async (data) => {
   const bcrypt = require("bcrypt");
-  const { email, novaSenha, confirmSenha } = data;
+  const { email, novaSenha, confirmSenha, codigo } = data;
   return new Promise((resolve, reject) => {
     const sql =
       "SELECT p.id_pessoa as id, p.nome, p.email " +
@@ -128,8 +158,6 @@ const changePassword = async (data) => {
         if (results && results.length > 0) {
           const id = results[0].id;
 
-          console.log("Fez a troca de senha!");
-
           if (novaSenha !== confirmSenha) {
             // Se a nova senha e a confirmação de senha não coincidirem, define o resultado como autenticação falsa
             result = {
@@ -138,26 +166,31 @@ const changePassword = async (data) => {
             };
             resolve(result);
           } else {
-            // Criptografa a nova senha com Bcrypt
-            bcrypt.hash(novaSenha, 10, (err, hash) => {
-              if (err) {
-                reject(err);
-              } else {
-                // Atualiza a senha do usuário no banco de dados
-                const updateSql = `UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?`;
-                console.log(updateSql);
-                connection.query(updateSql, [hash, id], (error) => {
-                  if (error) {
-                    // Em caso de erro ao atualizar a senha, rejeita a Promise com o erro
-                    reject(error);
-                  } else {
-                    // Senha atualizada com sucesso, define o resultado como autenticação verdadeira e retorna informações do usuário
-                    result = { auth: true, user: results[0] };
-                    resolve(result);
-                  }
-                });
-              }
-            });
+            // Verifica se o código de verificação é válido
+            if (codigo == null || codigo =="" || codigo !== process.env.VERIFICATION_CODE) {
+              result = { auth: false, message: "Código de verificação inválido!" };
+              resolve(result);
+            } else {
+              // Criptografa a nova senha com Bcrypt
+              bcrypt.hash(novaSenha, 10, (err, hash) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  // Atualiza a senha do usuário no banco de dados
+                  const updateSql = `UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?`;
+                  connection.query(updateSql, [hash, id], (error) => {
+                    if (error) {
+                      // Em caso de erro ao atualizar a senha, rejeita a Promise com o erro
+                      reject(error);
+                    } else {
+                      // Senha atualizada com sucesso, define o resultado como autenticação verdadeira e retorna informações do usuário
+                      result = { auth: true, message: "Senha atualizada com sucesso!", user: results[0] };
+                      resolve(result);
+                    }
+                  });
+                }
+              });
+            }
           }
         } else {
           // Se nenhum usuário for encontrado com o e-mail fornecido, define o resultado como autenticação falsa
@@ -166,7 +199,10 @@ const changePassword = async (data) => {
         }
       }
     });
+  }).catch((error) => {
+    console.log(error);
+    throw new Error("Erro ao atualizar senha do usuário.");
   });
 };
 
-module.exports = { get, login, verifyJWT, changePassword };
+module.exports = { get, login, verifyJWT, sendVerificationCode, updatePassword};
