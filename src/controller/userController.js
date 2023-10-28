@@ -1,4 +1,5 @@
 const userModel = require("../model/userModel");
+const nodemailer = require('nodemailer');
 
 //Função para obter o usuário
 exports.get = async (headers) => {
@@ -31,24 +32,25 @@ exports.login = async (body) => {
 };
 
 //Função para trocar a senha do usuário
-exports.changePassword = async (data) => {
-  const result = await userModel.changePassword(data);
-  if (result.auth) {
-    return {
-      success: true,
-      message: "Senha alterada com sucesso!",
-      user: {
-        id: result.user.id,
-        nome: result.user.nome,
-        email: result.user.email,
-      },
-    };
-  } else {
-    return {
-      success: false,
-      message:
-        "Não foi possível alterar a senha. Verifique as credenciais fornecidas.",
-      error: result.message,
-    };
+exports.sendVerificationCode = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const codigo = await userModel.sendVerificationCode(email);
+    res.status(200).json({ codigo });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erro ao enviar código de verificação." });
+  }
+};
+
+//Função para trocar a senha do usuário
+exports.updatePassword = async (req, res) => {
+  const { email, novaSenha, confirmSenha, codigo } = req.body;
+  try {
+    const result = await userModel.updatePassword({ email, novaSenha, confirmSenha, codigo });
+    res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erro ao atualizar senha do usuário." });
   }
 };
