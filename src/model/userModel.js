@@ -109,33 +109,57 @@ const verifyJWT = async (token, perfil) => {
   }
 };
 
+//Função para gerar um codigo de verificação
+const generateVerificationCode = async () => {
+  const code = Math.floor(Math.random()*1000000).toString().padStart(6, '0');
+  const expirationTime = Date.now() + 10 * 60 * 1000; // 10 minutes in milliseconds
+  return { code, expirationTime };
+};
+
+globalVerificationData = { code: null } // Variável global para armazenar o código de verificação
+
 // Função para enviar o e-mail com o código de verificação
 const sendVerificationCode = async (email) => {
-  const codigo = process.env.VERIFICATION_CODE;
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.PASSWORD,
-    },
-  });
-  const mailOptions = {
-    from: process.env.EMAIL,
-    to: email,
-    subject: "Código de verificação",
-    text: `Seu código de verificação é ${codigo}. Use-o para alterar sua senha.`,
-  };
-  return new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-        reject(error);
-      } else {
-        console.log("E-mail enviado: " + info.response);
-        resolve(codigo);
-      }
+  const verificarCode = await generateVerificationCode();
+  try{
+    await connection.query(`UPDATE usuario SET codigo = ? WHERE pessoa_id_pessoa = (SELECT id_pessoa FROM pessoa WHERE email = ?)`, [verificarCode, email]);
+
+    globalVerificationData = {
+      code: verificarCode
+    };
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
+      },
     });
-  });
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Código de verificação",
+      text: `Seu código de verificação é ${verificarCode}. Use-o para alterar sua senha. Ops: O código expira em 10 minutos.`,
+    };
+
+    return new Promise((resolve, reject) => {
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+          reject(error);
+        } else {
+          console.log("E-mail enviado: " + info.response);
+          resolve(verificarCode);
+        }
+      });
+    });
+
+  }catch(error){
+    console.error(error);
+    throw new Error("Erro ao enviar código de verificação.");
+  }
+
 };
 
 // Função para atualizar a senha do usuário
@@ -167,29 +191,38 @@ const updatePassword = async (data) => {
             resolve(result);
           } else {
             // Verifica se o código de verificação é válido
-            if (codigo == null || codigo =="" || codigo !== process.env.VERIFICATION_CODE) {
+            if (codigo == null || codigo =="") {
+              console.log("Código de verificação inválido!", codigo);
               result = { auth: false, message: "Código de verificação inválido!" };
               resolve(result);
             } else {
-              // Criptografa a nova senha com Bcrypt
-              bcrypt.hash(novaSenha, 10, (err, hash) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  // Atualiza a senha do usuário no banco de dados
-                  const updateSql = `UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?`;
-                  connection.query(updateSql, [hash, id], (error) => {
-                    if (error) {
-                      // Em caso de erro ao atualizar a senha, rejeita a Promise com o erro
-                      reject(error);
-                    } else {
-                      // Senha atualizada com sucesso, define o resultado como autenticação verdadeira e retorna informações do usuário
-                      result = { auth: true, message: "Senha atualizada com sucesso!", user: results[0] };
-                      resolve(result);
-                    }
-                  });
-                }
-              });
+              // Verifica se o token ainda é válido
+              const now = Date.now();
+              if (now > codigo.expirationTime) {
+                console.log("Token expirado!", codigo);
+                result = { auth: false, message: "Token expirado!" };
+                resolve(result);
+              } else {
+                // Criptografa a nova senha com Bcrypt
+                bcrypt.hash(novaSenha, 10, (err, hash) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    // Atualiza a senha do usuário no banco de dados
+                    const updateSql = `UPDATE usuario SET senha = ? WHERE pessoa_id_pessoa = ?`;
+                    connection.query(updateSql, [hash, id], (error) => {
+                      if (error) {
+                        // Em caso de erro ao atualizar a senha, rejeita a Promise com o erro
+                        reject(error);
+                      } else {
+                        // Senha atualizada com sucesso, define o resultado como autenticação verdadeira e retorna informações do usuário
+                        result = { auth: true, message: "Senha atualizada com sucesso!", user: results[0] };
+                        resolve(result);
+                      }
+                    });
+                  }
+                });
+              }
             }
           }
         } else {
