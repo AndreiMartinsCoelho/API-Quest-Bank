@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
+//--------------CONFIG do CORS e do EXPRESS----//
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -14,46 +16,28 @@ const {
     DB_PORT
 } = require('./config');
 
-//--------------Rotas principais----------------//
+//--------------ROTAS de USERs----------------//
+
 const userRouter = require('./router/user');
 app.use(userRouter);
 
-//rota principal da API
+//--------------ROTA ROUTE da API-------------//
+
 const router = require('./router/route');
 app.use(router);
 
-//--------------Rotas de usuário----------------//
+//--------------ROTAS de DISCIPLINAS----------//
 
-//Rota para o usuário
-const userRoute = require("./router/user");
-app.use('/user', userRoute);
-
-//Rota para o login do usuário
-const login = require('./router/user');
-app.use('/login', login);
-
-//-----------------------Rotas de disciplina-----------------------//
-
-//Rota para listar as disciplinas
-const disciplinha = require('./router/disciplina');
-app.use('/disciplina/listar', disciplinha);
-
-//Rota para as disciplinas
 const routerDisciplina = require('./router/disciplina');
 app.use(routerDisciplina);
 
-//-----------------------Rotas de topico-----------------------//
+//---------------ROTAS de TOPICOS-------------//
 
 const routerTopico = require('./router/Topico');
 app.use(routerTopico);
 
-//-----------------------Rotas de alternativa-----------------------//
+//---------------ROTAS de ALTERNATIVAS--------//
 
-//Rota para listar as alternativas
-const listarAlternativas = require('./router/Alternativa');
-app.use('/alternativa/listar', listarAlternativas);
-
-//Rota para as alternativas
 const routerAlternativa = require('./router/Alternativa');
 app.use(routerAlternativa);
 
