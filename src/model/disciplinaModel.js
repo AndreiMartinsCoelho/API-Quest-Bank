@@ -1,22 +1,6 @@
 const connection = require("./mysqlConnect").query();
 
-// Função para buscar todas as disciplinas
-const get = () => {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      "SELECT id_disciplina, nome FROM `infocimol`.`disciplina`;",
-      (error, rows) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(rows);
-        }
-      }
-    );
-  });
-};
-
-//Função para listar disciplinas
+//----Função para LISTAR as DISCIPLINAS----
 const list = (data) => {
   const { id } = data;
   return new Promise((resolve, reject) => {
@@ -38,7 +22,7 @@ const list = (data) => {
   });
 };
 
-//Função para obter disciplina por id
+//----Função para OBTER uma DISCIPLINA por ID---- 
 const getById = (id) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -55,4 +39,4 @@ const getById = (id) => {
   });
 };
 
-module.exports = { get, list, getById};
+module.exports = { list, getById};

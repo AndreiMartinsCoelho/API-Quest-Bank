@@ -1,43 +1,35 @@
 const disciplinaModel = require('../model/disciplinaModel');
 
-//Função para obter as disciplinas
-exports.get = async (headers) => {
+//----Função para LISTAR as DICIPLINAS----
+exports.listar = async (req, res) => {
     try {
-        const disciplinas = await disciplinaModel.get();
-        return { status: "success", msg: "Disciplinas obtidas com sucesso!", disciplinas };
-    } catch (error) {
-        // Tratar erro caso ocorra na consulta ao banco de dados
-        console.error("Erro ao obter disciplinas:", error);
-        return { status: "error", msg: "Ocorreu um erro ao obter as disciplinas. Por favor, tente novamente mais tarde." };
-    }
-};
-
-//Função para listar as disciplinas
-exports.listar = async (body) => {
-    try {
-      const disciplinas = await disciplinaModel.list();
-      return {
+      const disciplinas = await disciplinaModel.list(req.body);
+      return res.status(200).json({
         status: "success",
         msg: "Disciplinas listadas com sucesso!",
         disciplinas,
-      };
+      })
     } catch (error) {
-      return {
+      return res.status(500).json({
         status: "error",
         msg: "Ocorreu um erro ao buscar as disciplinas. Tente novamente mais tarde.",
-      };
+      })
     }
   };
 
-//Função para obter disciplina por id por parâmetro
-exports.getById = async (params) => {
-    const { id } = params;
+//----Função para OBTER uma DISCIPLINA por ID----
+exports.getById = async (req, res) => {
+    const idDisciplina = req.params.id;
     try {
-        const disciplina = await disciplinaModel.getById(id);
-        return { status: "success", msg: "Disciplina obtida com sucesso!", disciplina };
+        const disciplina = await disciplinaModel.getById(idDisciplina);
+        return res.status(200).json({ 
+          status: "success", msg: "Disciplina obtida com sucesso!", disciplina 
+        })
     } catch (error) {
-        // Tratar erro caso ocorra na consulta ao banco de dados
+        //----Tratamento de ERRO caso não ACHE a DISCIPLINA----
         console.error("Erro ao obter disciplina:", error);
-        return { status: "error", msg: "Ocorreu um erro ao obter a disciplina. Por favor, tente novamente mais tarde." };
+        return res.status(500).json({ 
+          status: "error", msg: "Ocorreu um erro ao obter a disciplina. Por favor, tente novamente mais tarde." 
+        })
     }
 };

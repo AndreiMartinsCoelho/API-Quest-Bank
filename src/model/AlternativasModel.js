@@ -1,17 +1,22 @@
 const connection = require("./mysqlConnect").query();
 
-//Função para criar um alternativa
+//----Função para criar um alternativa----
 const criarAlternativa = async (enunciado, idQuestao, correta) => {
+  //----Função TRIM para não permitir campo vazios nas COLUNAS----
+  if (enunciado.trim() === '' || correta.trim() === '' ) {
+    throw new Error('Enunciado e correta não podem ser vazios.');
+  }
+  //----Se tiver tudo OK, cria a ALTERNATIVA
   try {
-    const novoIdAlternativa = await obterNovoIdAlternativa();
-
+    const novoIdAlternativa = await obterNovoIdAlternativa(); //----Cria um ID para a alternativa----
+    //----INSERT para criar uma ALTERNTIVA----
     await new Promise((resolve, reject) => {
       connection.query(
         `INSERT INTO alternativa (id_alternativa, enunciado, questao_id_questao, correta) VALUES (?, ?, ?, ?)`,
         [novoIdAlternativa, enunciado, idQuestao, correta],
         (error) => {
-          if (error) {
-            resolve(null); // Retorna null em caso de erro
+          if (error || "") {
+            resolve(null); // ----Retorna NULL em caso de erro----
           } else {
             resolve();
           }
@@ -19,6 +24,7 @@ const criarAlternativa = async (enunciado, idQuestao, correta) => {
       );
     });
 
+    //----Retorna os resultados na resposta----
     const resultados = await new Promise((resolve, reject) => {
       connection.query(
         `SELECT a.id_alternativa, a.enunciado, a.correta, q.id_questao, q.nivel, q.tipo, q.enunciado AS questao_enunciado, q.enunciado_imagem AS questao_enunciado_imagem, q.resposta, t.id_topico, t.enunciado AS topico_enunciado, d.id_disciplina, d.nome AS disciplina_nome
@@ -30,7 +36,7 @@ const criarAlternativa = async (enunciado, idQuestao, correta) => {
         [novoIdAlternativa],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados);
           }
@@ -38,6 +44,7 @@ const criarAlternativa = async (enunciado, idQuestao, correta) => {
       );
     });
 
+    //----Return das respostas----
     return {
       id_alternativa: novoIdAlternativa,
       enunciado,
@@ -60,11 +67,11 @@ const criarAlternativa = async (enunciado, idQuestao, correta) => {
       },
     };
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-// Função para obter o id da questao pelo enunciado
+//----Função para obter o id da questao pelo enunciado----
 const obterIdQuestaoPorEnunciado = async (enunciadoQuestao) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -73,27 +80,27 @@ const obterIdQuestaoPorEnunciado = async (enunciadoQuestao) => {
         [enunciadoQuestao],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados);
           }
         }
       );
     });
-
+    //----Percorre os RESULTADOS e adiciona a QUESTÃO----
     if (resultados && resultados.length > 0) {
       return resultados[0].id_questao;
     } else {
-      return null; // Retorna null se não encontrar
+      return null; //----Retorna NULL se não encontrar----
     }
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-//Função para obter todas as alternativas
+//----FUNÃO para PEGEAR TODAS AS ALTERNATIVAS----
 const get = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => { //----Retorna uma PROMISE----
     connection.query(
       `SELECT a.id_alternativa, q.id_questao, q.nivel, q.tipo, q.resposta AS resposta, q.enunciado AS questao_enunciado, q.enunciado_imagem AS questao_enunciado_imagem, a.enunciado AS enunciado, a.correta, t.id_topico, t.enunciado AS topico_enunciado, d.id_disciplina, d.nome AS disciplina_nome
        FROM infocimol.alternativa a
@@ -133,7 +140,7 @@ const get = () => {
   });
 };
 
-// Função para obter o id da alternativa
+//----Pequena para ADICIONAR um ID----
 const obterNovoIdAlternativa = async () => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -141,7 +148,7 @@ const obterNovoIdAlternativa = async () => {
         `SELECT MAX(id_alternativa) as id FROM alternativa`,
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro---
           } else {
             resolve(resultados);
           }
@@ -149,23 +156,30 @@ const obterNovoIdAlternativa = async () => {
       );
     });
 
-    const novoIdAlternativa = resultados[0].id + 1;
+    const novoIdAlternativa = resultados[0].id + 1; //----Adiciona um novo ID para a prox ALTERNATIVA----
     return novoIdAlternativa;
+
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-//Função para editar uma alternativa
+//----Função para ATUALIZAR a ALTERNATIVA----
 const editarAlternativa = async (enunciado, correta, idAlternativa) => {
+  //----Função TRIM para não permitir campo vazios nas COLUNAS----
+  if (enunciado.trim() === '' || correta.trim() === '') {
+    throw new Error('Enunciado e correta não podem ser vazios.');
+  }
+
+  //----Se tiver tudo OK, ATUALIZA a alternativa----
   try {
     await new Promise((resolve, reject) => {
       connection.query(
         `UPDATE alternativa SET enunciado = ?, correta = ? WHERE id_alternativa = ?`,
         [enunciado, correta, idAlternativa],
         (error) => {
-          if (error) {
-            resolve(null); // Retorna null em caso de erro
+          if (error || "") {
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve();
           }
@@ -173,6 +187,7 @@ const editarAlternativa = async (enunciado, correta, idAlternativa) => {
       );
     });
 
+    //----RESULTADOS da ATUALIZAÇÃO----
     const resultados = await new Promise((resolve, reject) => {
       connection.query(
         `SELECT a.id_alternativa, a.enunciado, a.correta, q.id_questao, q.nivel, q.tipo, q.enunciado AS questao_enunciado, q.enunciado_imagem AS questao_enunciado_imagem, q.resposta, t.id_topico, t.enunciado AS topico_enunciado, d.id_disciplina, d.nome AS disciplina_nome
@@ -184,7 +199,7 @@ const editarAlternativa = async (enunciado, correta, idAlternativa) => {
         [idAlternativa],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados);
           }
@@ -192,6 +207,7 @@ const editarAlternativa = async (enunciado, correta, idAlternativa) => {
       );
     });
 
+    //----Retorna a ALTERNATIVA ATUALIZADA----
     const alternativaEditada = {
       id_alternativa: idAlternativa,
       enunciado,
@@ -222,7 +238,7 @@ const editarAlternativa = async (enunciado, correta, idAlternativa) => {
   }
 };
 
-//Função para excluir uma alternativa
+//----Função para DELETAR ALTERNATIVA----
 const excluirAlternativa = (idAlternativa) => {
   try{
   return new Promise((resolve, reject) => {
@@ -232,7 +248,7 @@ const excluirAlternativa = (idAlternativa) => {
       (error, results) => {
         if (error) {
           reject(error);
-        } else if (results.affectedRows === 0) {
+        } else if (results.affectedRows === 0) { //----Se não existir o ID, retorna essa LINDA MSG----
           reject(new Error(`Não foi possível encontrar a alternativa com o id ${idAlternativa}`));
         } else {
           resolve(results);
@@ -245,7 +261,7 @@ const excluirAlternativa = (idAlternativa) => {
   }
 };
 
-//Função para obter uma alternativa específica pelo seu ID
+//----Função para OBTER uma ALTERNATIVA por um ID----
 const obterAlternativaPorId = async (idAlternativa) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -259,7 +275,7 @@ const obterAlternativaPorId = async (idAlternativa) => {
         [idAlternativa],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados);
           }
@@ -267,6 +283,7 @@ const obterAlternativaPorId = async (idAlternativa) => {
       );
     });
 
+    //----Retorna os RESULTADOS----
     if (resultados && resultados.length > 0) {
       return {
         id_alternativa: resultados[0].id_alternativa,
@@ -290,10 +307,10 @@ const obterAlternativaPorId = async (idAlternativa) => {
         },
       };
     } else {
-      return null; // Retorna null se não encontrar
+      return null; //----Retorna NULL se não encontrar----
     }
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
