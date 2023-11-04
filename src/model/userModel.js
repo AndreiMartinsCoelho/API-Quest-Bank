@@ -169,9 +169,42 @@ const sendVerificationCode = async (email) => {
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: "Código de verificação",
-      text: `Seu código de verificação é ${code}. Use-o para alterar sua senha. Ops: O código expira em 20 minutos.`,
-    };
+      subject: "Instruções para Redefinir sua Senha",
+      html:`
+      <html style=" height: auto; min-height:40rem ;">
+      <head>
+      </head>
+      <body style="border: solid 1px #969696; background-color: #ffffff; height: auto;">
+        <div style="width: auto; min-height: 120px; background: url('https://p4.wallpaperbetter.com/wallpaper/927/915/635/blue-photo-books-classic-different-hd-wallpaper-preview.jpg'); background-size: cover;"></div>
+        <br>
+        <h1 style="text-align: center; color: #1DA1F2;">Redefinição de senha:</h1>
+        <p style="text-align: center;">Prezado(a) Professor(a)</p>
+      <div style="margin: 1rem 3rem; ">
+      <p >Esperamos que esta mensagem o encontre bem. Você solicitou a redefinição de senha para a sua conta em nosso sistema. Para completar o processo, siga as instruções abaixo:</p>
+      
+        <p><span style="color: #1DA1F2;">Passo 1:</span> Acesse a página de redefinição de senha</p>
+  
+        <p><span style="color: #1DA1F2;">Passo 2:</span> Na página de redefinição de senha, insira o seguinte código: 
+        <span style="color: #1DA1F2;">OBS: O código expira em 20 minutos!</span>
+          <br><br><br><br>
+          <div style="width: 100%; height: 50px; display: flex; align-items: center; justify-content: center;">
+          <div style="border: solid 2px #ffffff; box-shadow: 0px 4px 15px 0px rgba(255, 34, 0, 0.74); display: flex; align-items: center; justify-content: center; text-align: center; background-color: #1DA1F2; width: 100%; height: 4rem; border-radius: 10px; font-size: 28px; color: #ffffff;">
+            <div style="margin:1% 45%;">${code}</div>
+          </div>
+        </div>
+        <br><br>
+         </p>
+      
+        <p><span style="color: #1DA1F2;">Passo 3:</span> Crie uma Nova Senha</p>
+      
+        <p>Após inserir o código de redefinição, você será direcionado(a) a criar uma nova senha segura para a sua conta. Certifique-se de escolher uma senha que seja única e que contenha uma combinação de letras maiúsculas, minúsculas, números e caracteres especiais.</p>
+      
+        <p>Agradecemos a sua atenção e estamos à disposição para ajudar em caso de dúvidas ou problemas.</p>
+        <br>
+        <p>Atenciosamente, <span style="color: #1DA1F2; font-weight: 600; font-size: 18px;">QuestBank</span>.</span></p></div>
+      <div style="background-color: #1DA1F2; height: 40px;"></div>
+      </body>
+      </html> `,};
 
     const info = await transporter.sendMail(mailOptions);
 
