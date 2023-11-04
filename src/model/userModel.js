@@ -188,6 +188,7 @@ const updatePassword = async (data) => {
   const bcrypt = require("bcrypt");
   const { email, novaSenha, confirmSenha, codigo } = data;
   return new Promise((resolve, reject) => {
+    try{
     const sql =
       "SELECT p.id_pessoa as id, p.nome, p.email, cu.codigo, cu.codigo_prazo, cu.codigo_usado " +
       "FROM usuario u " +
@@ -199,27 +200,18 @@ const updatePassword = async (data) => {
       if (error) {
         reject(error);
       } else {
-        let result = null;
         if (results && results.length > 0) {
           const id = results[0].id;
           const codigoDB = results[0].codigo;
 
           if (novaSenha !== confirmSenha) {
-            result = {
-              auth: false,
-              message: "A nova senha e a confirmação de senha não coincidem.",
-            };
-            resolve(result);
+            reject(new Error("A nova senha e a confirmação de senha não coincidem."));
           } else {
             if (codigo === codigoDB) {
               const codigoPrazo = results[0].codigo_prazo;
               const agora = new Date();
               if (agora > codigoPrazo) {
-                result = {
-                  auth: false,
-                  message: "O prazo do código de verificação expirou!",
-                };
-                resolve(result);
+                reject(new Error("O prazo do código de verificação expirou!"));
               } else {
                 bcrypt.hash(novaSenha, 10, (err, hash) => {
                   if (err) {
@@ -238,7 +230,7 @@ const updatePassword = async (data) => {
                             if (error) {
                               reject(error);
                             } else {
-                              result = {
+                              const result = {
                                 auth: true,
                                 message: "Senha atualizada com sucesso!",
                                 user: results[0],
@@ -253,23 +245,21 @@ const updatePassword = async (data) => {
                 });
               }
             } else {
-              console.log("Código de verificação inválido!", codigo);
-              result = {
-                auth: false,
-                message: "Código de verificação inválido!",
-              };
-              resolve(result);
+              reject(new Error("Código de verificação inválido!"));
             }
           }
         } else {
-          result = { auth: false, message: "E-mail de usuário inválido!" };
-          resolve(result);
+          reject(new Error("E-mail de usuário inválido!"));
         }
       }
     });
+  }catch(error){
+      console.log(error);
+      reject(new Error("Erro ao atualizar senha do usuário."));
+    };
   }).catch((error) => {
     console.log(error);
-    throw new Error("Erro ao atualizar senha do usuário.");
+    reject(new Error("Erro ao atualizar senha do usuário."));
   });
 };
 
