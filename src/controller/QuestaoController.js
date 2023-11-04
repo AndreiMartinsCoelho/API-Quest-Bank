@@ -12,7 +12,7 @@ exports.get = async (req, res) => {
     });
   } catch (error) {
     console.error("Erro ao listar as questões:", error);
-    res.status(500).json({
+    res.status(404).json({
       status: "error",
       msg: "Ops! Ocorreu algum erro...",
     });
@@ -30,7 +30,7 @@ exports.getQuestoes = async (req,res)=>{
     });
   }catch(error){
     console.error("Erro ao listar as questões:", error);
-    res.status(500).json({
+    res.status(404).json({
       status: "error",
       msg: "Ops! Ocorreu algum erro...",
     });
@@ -46,13 +46,13 @@ exports.criar = async (req, res) => {
     );
 
     return res.status(200).json({
-      status: 200,
+      status: "success",
       msg: "Questão adicionada com sucesso...",
       resp: [questionDetails],
     })
   } catch (error) {
     console.error("Erro ao adicionar a questão:", error);
-    return res.status(200).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! ocorreu um erro fatal ao adicionar a questão...",
     })
@@ -67,19 +67,19 @@ exports.editar = async (req, res) => {
     const updatedQuestion = await QuestaoModel.editarQuestao(tipo, nivel, enunciado, Enunciado_imagem, resposta, idQuestao);
     console.log(updatedQuestion);
     if (updatedQuestion) {
-      return res.json({
+      return res.status(200).json({
         status: "success",
         msg: "Questão atualizada com sucesso...",
         data: updatedQuestion,
       });
     } else {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
         msg: "Ops! ocorreu um erro ao atualizar a questão...",
       });
     }
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! ocorreu um erro fatal ao atualizar a questão...",
     });
@@ -92,18 +92,18 @@ exports.excluir = async (req, res) => {
   try {
     const success = await QuestaoModel.excluirQuestao(idQuestao);
     if (success) {
-      return res.json({
+      return res.status(200).json({
         status: "success",
         msg: "Questão deletada com sucesso...",
       });
     } else {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
         msg: "Ops! ocorreu um erro ao deletar a questão...",
       });
     }
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! ocorreu um erro fatal ao deletar a questão...",
     });
@@ -116,19 +116,19 @@ exports.obterQuestao = async (req, res) => {
   try {
     const result = await QuestaoModel.verQuestao(idQuestao);
     if (result) {
-      return res.json({
+      return res.status(200).json({
         status: "success",
         msg: "Questão obtida com sucesso...",
         questao: result,
       });
     } else {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
         msg: "Ops! ocorreu um erro ao obter a questão...",
       });
     }
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! ocorreu um erro fatal ao obter a questão...",
     });
@@ -141,7 +141,7 @@ exports.buscarQuestoesPorEnunciado = async (req, res) => {
   try {
     const questoes = await QuestaoModel.buscarQuestoesPorEnunciado(enunciado);
     if (questoes.length > 0) {
-      return res.json({
+      return res.status(200).json({
         status: "success",
         msg: "Questões encontradas com sucesso...",
         questoes: questoes,
@@ -153,7 +153,7 @@ exports.buscarQuestoesPorEnunciado = async (req, res) => {
       });
     }
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! ocorreu um erro ao buscar as questões...",
     });

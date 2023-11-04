@@ -10,7 +10,7 @@ exports.get = async (req, res) => {
       alternativas: result,
     })
   } else {
-    return res.status(200).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! Você não está autenticado...",
     })
@@ -23,7 +23,7 @@ exports.criar = async (req, res) => {
     const { enunciado, enunciadoQuestao, correta } = req.body;
 
     if (!enunciado || !enunciadoQuestao || !correta) {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
         msg: "Por favor, preencha todos os campos corretamente...",
       })
@@ -34,7 +34,7 @@ exports.criar = async (req, res) => {
     );
 
     if (!questaoId) {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
         msg: "Por favor, preencha todos os campos corretamente...",
       })
@@ -54,7 +54,7 @@ exports.criar = async (req, res) => {
 
   } catch (error) {
     console.error("Erro ao adicionar alternativa...", error);
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! Ocorreu algum erro ao adicionar a alternativa...",
     })
@@ -69,7 +69,7 @@ exports.editar = async (req, res) => {
         const success = await AlternativasModel.editarAlternativa(enunciado, correta, idAlternativa);
 
         if(!enunciado || !correta){
-          return res.status(500).json({
+          return res.status(404).json({
             stauts:"error",
             msg:"Ops! Ocorreu algum erro ao atualizar a alternativa..."
           })
@@ -81,7 +81,7 @@ exports.editar = async (req, res) => {
           });
         }
     } catch (error) {
-        return res.status(500).json({
+        return res.status(404).json({
             status: "error",
             msg: "Ops! Ocorreu algum erro ao atualizar a alternativa..."
         });
@@ -94,18 +94,18 @@ exports.excluir = async (req, res) => {
     try {
         const success = await AlternativasModel.excluirAlternativa(idAlternativa);
         if (success) {
-            return res.json({
+            return res.status(200).json({
                 status: "success",
                 msg: "Alternativa deletada com sucesso..."
             });
         } else {
-            return res.status(500).json({
+            return res.status(404).json({
                 status: "error",
                 msg: "Ops! Ocorreu algum erro ao deletar a alternativa..."
             });
         }
     } catch (error) {
-        return res.status(500).json({
+        return res.status(404).json({
             status: "error",
             msg: "Ops! Ocorreu algum erro ao deletar a alternativa..."
         });
@@ -124,13 +124,13 @@ exports.obterAlternativa = async (req, res) => {
                 alternativa: result,
             });
         } else {
-            return res.status(500).json({
+            return res.status(404).json({
                 status: "error",
                 msg: "Ops! Ocorreu algum erro ao obter a alternativa..."
             });
         }
     } catch (error) {
-        return res.status(500).json({
+        return res.status(404).json({
             status: "error",
             msg: "Ops! Ocorreu algum erro ao obter a alternativa..."
         });

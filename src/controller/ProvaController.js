@@ -13,7 +13,7 @@ exports.listar = async (req, res) => {
     });
   } catch (error) {
     console.error("Erro ao listar Provas:", error);
-    res.status(500).json({
+    res.status(404).json({
       status: "error",
       msg: "Ops! Ocorreu algum erro...",
     });
@@ -30,7 +30,7 @@ exports.listarProvas = async (req, res) => {
       provas: provas,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(404).json({
       status: "error",
       msg: "Ops! Ocorreu algum erro...",
     });
@@ -70,7 +70,7 @@ exports.criar = async (req, res) => {
     }
   } catch (error) {
     console.error("Erro ao criar prova:", error);
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! Ocorreu algum erro ao criar prova...",
     });
@@ -90,19 +90,19 @@ exports.editar = async (req, res) => {
       idProva
     );
     if (prova) {
-      return res.json({
+      return res.status(200).json({
         status: "success",
         msg: "Prova atualizada com sucesso...",
         prova: prova,
       });
     } else {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
         msg: "Ops! Ocorreu um erro ao atualizar a prova...",
       });
     }
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! Ocorreu um erro fatal ao atualizar a prova..",
     });
@@ -115,18 +115,18 @@ exports.excluir = async (req, res) => {
   try {
     const success = await ProvaModel.excluirProva(idProva);
     if (success) {
-      return res.json({
+      return res.status(200).json({
         status: "success",
         msg: "Prova deletada com sucesso...",
       });
     } else {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
         msg: "Ops! Ocorreu um erro ao deletar a prova...",
       });
     }
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! Ocorreu um erro fatal ao deletar a prova..",
     });
@@ -139,19 +139,19 @@ exports.obterProva = async (req, res) => {
   try {
     const result = await ProvaModel.obterProvaPorId(idProva);
     if (result) {
-      return res.json({
+      return res.status(200).json({
         status: "success",
         msg: "Prova listada com sucesso...",
         prova: result,
       });
     } else {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
         msg: "Ops! Ocorreu um erro ao listar a prova...",
       });
     }
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! Ocorreu um erro fatal ao listar a prova..",
     });
@@ -163,13 +163,13 @@ exports.buscarProvaPorEnunciado = async (req, res) => {
   const enunciado = req.params.enunciado;
   try {
     const provas = await ProvaModel.buscarProvaPorEnunciado(enunciado);
-    return res.json({
+    return res.status(200).json({
       status: "success",
       msg: "Provas encontradas com sucesso...",
       provas: provas,
-    });
+    })
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       status: "error",
       msg: "Ops! ocorreu um erro ao buscar as provas...",
     });
@@ -182,7 +182,9 @@ exports.gerarProva = async (req, res) => {
     const prova = await ProvaModel.obterProvaPorId(req.params.id);
 
     if (!prova) {
-      return res.status(404).json({ error: "Prova não encontrada" });
+      return res.status(404).json({ 
+        error: "Prova não encontrada" 
+      });
     }
 
     const gerarPDF = ProvaModel.gerarPDF;
@@ -202,10 +204,14 @@ exports.gerarProva = async (req, res) => {
 
     stream.on("error", (err) => {
       console.error(err);
-      res.status(500).json({ error: "Erro ao enviar o arquivo PDF" });
+      res.status(404).json({ 
+        error: "Erro ao enviar o arquivo PDF" 
+      });
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erro ao gerar a prova" });
+    res.status(404).json({ 
+      error: "Erro ao gerar a prova" 
+    });
   }
 };

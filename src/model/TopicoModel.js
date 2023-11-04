@@ -1,7 +1,12 @@
 const connection = require("./mysqlConnect").query();
 
-// Função para criar um tópico
+//----Função para ADICIONAR um TOPICO----
 const criarTopico = async (enunciado, disciplina, idProfessor) => {
+  //----Função TRIM para não permitir campo vazios nas COLUNAS----
+  if (enunciado.trim() === '' ) {
+    throw new Error('Enunciado e disciplina não podem ser vazios.');
+  }
+
   try {
     const novoIdTopico = await obterNovoIdTopico();
     const nomePessoa = await obterNomePessoa(idProfessor);
@@ -20,7 +25,7 @@ const criarTopico = async (enunciado, disciplina, idProfessor) => {
         [novoIdTopico, enunciado, idDisciplina, idProfessor],
         (error) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve();
           }
@@ -42,11 +47,11 @@ const criarTopico = async (enunciado, disciplina, idProfessor) => {
       },
     };
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-//Função para obter o nome da disciplina
+//----Função para OBTER o NOME da DISCIPLINA----
 const obterNomeDisciplina = async (idDisciplina) => {
   try {
     const disciplina = await new Promise((resolve, reject) => {
@@ -55,7 +60,7 @@ const obterNomeDisciplina = async (idDisciplina) => {
         [idDisciplina],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados[0]?.nome || "");
           }
@@ -64,11 +69,11 @@ const obterNomeDisciplina = async (idDisciplina) => {
     });
     return disciplina;
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-// Função para obter o id da disciplina pelo nome
+//----Função para OBTER um ID da DISCIPLINA pelo NOME----
 const obterIdDisciplinaPorNome = async (nomeDisciplina) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -77,7 +82,7 @@ const obterIdDisciplinaPorNome = async (nomeDisciplina) => {
         [nomeDisciplina],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados);
           }
@@ -88,11 +93,11 @@ const obterIdDisciplinaPorNome = async (nomeDisciplina) => {
     const idDisciplina = resultados[0]?.id_disciplina;
     return idDisciplina;
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-// Função para obter todos os tópicos
+//----Função para LISTAR todos os TOPICOS pelo PROF----
 const obterTodosOsTopicos = async (idProfessor) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -109,7 +114,7 @@ const obterTodosOsTopicos = async (idProfessor) => {
         [idProfessor],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados);
           }
@@ -141,11 +146,11 @@ const obterTodosOsTopicos = async (idProfessor) => {
 
     return topicos;
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-// Função para obter todos os tópicos
+//----Função para LSITAR todos os TOPICOS sem PROF----
 const getTopicos = async (id) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -161,7 +166,7 @@ const getTopicos = async (id) => {
         [id],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados);
           }
@@ -193,11 +198,11 @@ const getTopicos = async (id) => {
 
     return topicos;
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-// Função para obter o próximo id do tópico
+//----Função para LISTAR o próximo ID do TOPICO----
 const obterNovoIdTopico = async () => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -205,7 +210,7 @@ const obterNovoIdTopico = async () => {
         "SELECT MAX(id_topico) AS max_id FROM topico",
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados);
           }
@@ -216,11 +221,11 @@ const obterNovoIdTopico = async () => {
     const proximoId = resultados[0]?.max_id ? resultados[0].max_id + 1 : 1;
     return proximoId;
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-//Função para obter o nome da pessoa pelo id do professor
+//----Função para OBTER o NOME da PESSOA pelo ID do PROF----
 const obterNomePessoa = async (idProfessor) => {
   try {
     const pessoa = await new Promise((resolve, reject) => {
@@ -229,7 +234,7 @@ const obterNomePessoa = async (idProfessor) => {
         [idProfessor],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados[0]?.nome || "");
           }
@@ -238,11 +243,11 @@ const obterNomePessoa = async (idProfessor) => {
     });
     return pessoa;
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-//Função para obter o perfil do usuário pelo id do professor
+//----Função para OBTER o PERFIL pelo ID do professor----
 const obterPerfilUsuario = async (idProfessor) => {
   try {
     const usuario = await new Promise((resolve, reject) => {
@@ -251,7 +256,7 @@ const obterPerfilUsuario = async (idProfessor) => {
         [idProfessor],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados[0]?.perfil || "");
           }
@@ -260,11 +265,11 @@ const obterPerfilUsuario = async (idProfessor) => {
     });
     return usuario;
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-//Função para exluir topico
+//----Função para DELETAR um TOPICO----
 const excluir = async (idTopico) => {
   try {
     const result = await new Promise((resolve, reject) => {
@@ -273,7 +278,7 @@ const excluir = async (idTopico) => {
         [idTopico],
         (error, results) => {
           if (error) {
-            reject(error); // Rejeita o erro em caso de falha
+            reject(error); //----Rejeita o erro em caso de FALHA----
           } else if (results.affectedRows === 0) {
             reject(new Error("O id do tópico não existe mais."));
           } else {
@@ -283,14 +288,18 @@ const excluir = async (idTopico) => {
       );
     });
 
-    return result; // Retorna o resultado da query (deve ser true se excluído com sucesso)
+    return result; //----Retorna o resultado da QUERY----
   } catch (error) {
-    throw error; // Lança o erro para ser capturado no bloco catch
+    throw error; //----Lança o erro para ser CAPTURADO no bloco catch----
   }
 };
 
-//Função para editar topico
+//----Função para ATUALIZAR um TOPICO----
 const editar = async (idTopico, enunciado) => {
+    //----Função TRIM para não permitir campo vazios nas COLUNAS----
+    if (enunciado.trim() === '') {
+      throw new Error('Enunciado e disciplina não podem ser vazios.');
+    }
   try {
     await new Promise((resolve, reject) => {
       connection.query(
@@ -298,7 +307,7 @@ const editar = async (idTopico, enunciado) => {
         [enunciado, idTopico],
         (error) => {
           if (error) {
-            reject(error); // Rejeita o erro em caso de falha
+            reject(error); //----Rejeita o erro em caso de FALHA----
           } else {
             resolve();
           }
@@ -310,11 +319,11 @@ const editar = async (idTopico, enunciado) => {
 
     return topico;
   } catch (error) {
-    throw error; // Lança o erro para ser capturado no bloco catch
+    throw error; //----Lança o erro para ser CAPTURADO no bloco catch----
   }
 };
 
-// Função para obter um tópico específico pelo seu ID
+//----Função para LISTAR um TOPICO específico pelo seu ID----
 const obterTopicoPorId = async (idTopico) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -330,7 +339,7 @@ const obterTopicoPorId = async (idTopico) => {
         [idTopico],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro---
           } else {
             resolve(resultados);
           }
@@ -354,11 +363,11 @@ const obterTopicoPorId = async (idTopico) => {
 
     return topico[0];
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
-//Função para obter um topico pelo enunciado
+//----Função para BUSCAR um TOPICO pelo ENUNCIADO----
 const obterTopicoPorEnunciado = (enunciado) => {
   return new Promise((resolve, reject) => {
     connection.query(
