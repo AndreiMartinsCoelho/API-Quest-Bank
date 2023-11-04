@@ -3,28 +3,25 @@ const QuestaoRouter = express.Router();
 const QuestaoController = require('../controller/QuestaoController');
 const Middleware = require('../middleware/auth');
 
-//Função para obter as questões
+//----ROTA para LISTAR as QUESTÕES pelo PROFESSOR----
 QuestaoRouter.get('/questao/listar', Middleware.verifyToken, QuestaoController.get);
 
-//Função para obter as questões
+//----ROTA para LISTAR as QUESTÕES sem PROFESSOR----
 QuestaoRouter.get('/questoes/listar', Middleware.verifyToken, QuestaoController.getQuestoes);
 
-//Função para criar a questão
-QuestaoRouter.post('/questao/adicionar', Middleware.verifyToken, async(req, res, next)=>{
-    user=await QuestaoController.criar(req.body);
-    res.status(200).send(user);
-});
+//----ROTA para ADICIONAR a QUESTÃO----
+QuestaoRouter.post('/questao/adicionar', Middleware.verifyToken, QuestaoController.criar);
 
-//Função para editar a questão
+//----ROTA para ATUALIZAR a QUESTÃO----
 QuestaoRouter.put('/questao/atualizar/:id', Middleware.verifyToken, QuestaoController.editar);
 
-//Função para excluir a questão
+//----ROTA para DELETAR a QUESTÃO----
 QuestaoRouter.delete('/questao/deletar/:id', Middleware.verifyToken, QuestaoController.excluir);
 
-//Função para obter uma questão específica pelo seu ID
+//----ROTA para LISTAR uma QUESTÃO específica pelo seu ID----
 QuestaoRouter.get('/questao/listar/:id', Middleware.verifyToken, QuestaoController.obterQuestao);
 
-//Função para obter uma questão específica pelo enunciado
+//----ROTA para OBTER QUESTÕES específicaS pelo ENUNCIADO----
 QuestaoRouter.get('/questao/buscar/:enunciado', Middleware.verifyToken, QuestaoController.buscarQuestoesPorEnunciado);
 
 module.exports = QuestaoRouter;

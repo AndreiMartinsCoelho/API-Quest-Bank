@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-//--------------CONFIG do CORS e do EXPRESS----//
+//--------------CONFIG do CORS e do EXPRESS---//
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -31,35 +31,27 @@ app.use(router);
 const routerDisciplina = require('./router/disciplina');
 app.use(routerDisciplina);
 
-//---------------ROTAS de TOPICOS-------------//
+//--------------ROTAS de TOPICOS--------------//
 
 const routerTopico = require('./router/Topico');
 app.use(routerTopico);
 
-//---------------ROTAS de ALTERNATIVAS--------//
+//--------------ROTAS de ALTERNATIVAS---------//
 
 const routerAlternativa = require('./router/Alternativa');
 app.use(routerAlternativa);
 
-//-----------------------Rotas de questão-----------------------//
+//--------------ROTAS de QUESTÕES-------------//
 
-//Rota para listar as questões
-const listarQuestao = require('./router/Questao');
-app.use('/questao/listar', listarQuestao);
-
-//Rota para as questões
 const routerQuestao = require('./router/Questao');
 app.use(routerQuestao);
 
-//-------------Rotas de prova----------------//
+//--------------ROTAS de PROVAS---------------//
 
-//Rota para listar as provas
-const listarProva = require('./router/Prova');
-app.use('/prova/listar', listarProva);
-
-//Rota para as provas
 const routerProva = require('./router/Prova');
 app.use(routerProva);
+
+//--------------------------------------------//
 
 // const config = require('./config');
 // app.use(config);

@@ -1,7 +1,7 @@
 const ProvaModel = require("../model/ProvaModel");
-const fs = require('fs');
+const fs = require("fs");
 
-//Função para listar as provas
+//----Função de LISTAR de PROVAS com PROFESSOR----
 exports.listar = async (req, res) => {
   const idProfessor = req.query.idProfessor;
   try {
@@ -20,61 +20,64 @@ exports.listar = async (req, res) => {
   }
 };
 
-//Função para listar as provas sem filtro
+//----Função para LISTAR as PROVAS sem FILTRO----
 exports.listarProvas = async (req, res) => {
   const provas = await ProvaModel.getProvas();
-  try{
+  try {
     res.status(200).json({
-      status:"success",
-      msg:"Provas listadas com sucesso...",
-      provas: provas
-    })
-  }catch(error){
-    res.status(500).json({
-      status:"error",
-      msg:"Ops! Ocorreu algum erro..."
-    })
-  }
-};
-
-//Função para criar a prova
-exports.criar = async (body) => {
-  const result = await ProvaModel.criar(body);
-  if (result.novaProvaId) {
-    const provaCriada = result.provaDetalhes;
-
-    const questoes = result.questoes.map((questaoId) => {
-      const questaoEncontrada = body.questoes.find(
-        (questao) => questao.id_questao === questaoId
-      );
-
-      if (questaoEncontrada) {
-        return {
-          enunciado_questao: questaoId,
-        };
-      } else {
-        return {
-          questao: questaoId
-        };
-      }
-    });
-
-    return {
       status: "success",
-      msg: "Prova criada com sucesso...",
-      provas: [provaCriada],
-      questoes: questoes,
-    };
-  } else {
-    // Tratar caso em que a prova não foi criada
-    return {
+      msg: "Provas listadas com sucesso...",
+      provas: provas,
+    });
+  } catch (error) {
+    res.status(500).json({
       status: "error",
-      msg: "Ops! Ocorreu algum erro ao criar prova..."
-    };
+      msg: "Ops! Ocorreu algum erro...",
+    });
   }
 };
 
-//Função para editar a prova
+//----Função para ADICIONAR a PROVA----
+exports.criar = async (req, res) => {
+  try {
+    const result = await ProvaModel.criar(req.body);
+
+    if (result.novaProvaId) {
+      const provaCriada = result.provaDetalhes;
+
+      const questoes = result.questoes.map((questaoId) => {
+        const questaoEncontrada = req.body.questoes.find(
+          (questao) => questao.id_questao === questaoId
+        );
+
+        if (questaoEncontrada) {
+          return {
+            enunciado_questao: questaoId,
+          };
+        } else {
+          return {
+            questao: questaoId,
+          };
+        }
+      });
+
+      return res.status(200).json({
+        status: "success",
+        msg: "Prova criada com sucesso...",
+        provas: [provaCriada],
+        questoes: questoes,
+      });
+    }
+  } catch (error) {
+    console.error("Erro ao criar prova:", error);
+    return res.status(500).json({
+      status: "error",
+      msg: "Ops! Ocorreu algum erro ao criar prova...",
+    });
+  }
+};
+
+//----Função para ATUALIZAR a PROVA----
 exports.editar = async (req, res) => {
   const idProva = req.params.id;
   const { enunciado, descricao, tipo } = req.body;
@@ -106,7 +109,7 @@ exports.editar = async (req, res) => {
   }
 };
 
-//Função para excluir a prova
+//----Função para DELETAR a PROVA----
 exports.excluir = async (req, res) => {
   const idProva = req.params.id;
   try {
@@ -130,79 +133,79 @@ exports.excluir = async (req, res) => {
   }
 };
 
-//Função para obter uma prova pelo id
+//----Função para OBTER uma PROVA pelo ID----
 exports.obterProva = async (req, res) => {
-    const idProva = req.params.id;
-    try {
-        const result = await ProvaModel.obterProvaPorId(idProva);
-        if (result) {
-            return res.json({
-                status: "success",
-                msg: "Prova listada com sucesso...",
-                prova: result,
-            });
-        } else {
-            return res.status(500).json({
-                status: "error",
-                msg: "Ops! Ocorreu um erro ao listar a prova...",
-            });
-        }
-    } catch (error) {
-        return res.status(500).json({
-            status: "error",
-            msg: "Ops! Ocorreu um erro fatal ao listar a prova..",
-        });
+  const idProva = req.params.id;
+  try {
+    const result = await ProvaModel.obterProvaPorId(idProva);
+    if (result) {
+      return res.json({
+        status: "success",
+        msg: "Prova listada com sucesso...",
+        prova: result,
+      });
+    } else {
+      return res.status(500).json({
+        status: "error",
+        msg: "Ops! Ocorreu um erro ao listar a prova...",
+      });
     }
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      msg: "Ops! Ocorreu um erro fatal ao listar a prova..",
+    });
+  }
 };
 
+//----Função para BUSCAR uma prova por ENUNCIADO----
 exports.buscarProvaPorEnunciado = async (req, res) => {
   const enunciado = req.params.enunciado;
   try {
     const provas = await ProvaModel.buscarProvaPorEnunciado(enunciado);
     return res.json({
-      status: 'success',
-      msg: 'Provas encontradas com sucesso...',
-      provas: provas
+      status: "success",
+      msg: "Provas encontradas com sucesso...",
+      provas: provas,
     });
   } catch (error) {
     return res.status(500).json({
-      status: 'error',
-      msg: 'Ops! ocorreu um erro ao buscar as provas...',
+      status: "error",
+      msg: "Ops! ocorreu um erro ao buscar as provas...",
     });
   }
 };
 
-//Função para gerar a prova em PDF
+//----Função para GERAR a PROVA em PDF----
 exports.gerarProva = async (req, res) => {
   try {
     const prova = await ProvaModel.obterProvaPorId(req.params.id);
 
     if (!prova) {
-      return res.status(404).json({ error: 'Prova não encontrada' });
+      return res.status(404).json({ error: "Prova não encontrada" });
     }
 
-    //Ain Nobru
     const gerarPDF = ProvaModel.gerarPDF;
     const nomeArquivo = gerarPDF(prova);
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=${nomeArquivo}`);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=${nomeArquivo}`);
     const stream = fs.createReadStream(nomeArquivo);
 
-    stream.on('open', () => {
+    stream.on("open", () => {
       stream.pipe(res);
     });
 
-    stream.on('end', () => {
-      fs.unlinkSync(nomeArquivo); // Remova o arquivo após o envio
+    stream.on("end", () => {
+      fs.unlinkSync(nomeArquivo); //----Remova o PDF após o ENVIO----
     });
 
-    stream.on('error', (err) => {
+    stream.on("error", (err) => {
       console.error(err);
-      res.status(500).json({ error: 'Erro ao enviar o arquivo PDF' });
+      res.status(500).json({ error: "Erro ao enviar o arquivo PDF" });
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erro ao gerar a prova' });
+    res.status(500).json({ error: "Erro ao gerar a prova" });
   }
 };

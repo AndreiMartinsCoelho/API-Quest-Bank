@@ -1,6 +1,6 @@
 const QuestaoModel = require("../model/QuestaoModel");
 
-//Função para obter as questões
+//----Função para LISTAR as QUESTÕES por PROFESSOR----
 exports.get = async (req, res) => {
   const idProfessor = req.query.idProfessor;
   try {
@@ -19,6 +19,7 @@ exports.get = async (req, res) => {
   }
 };
 
+//----Função para LISTAR as QUESTÕES sem ser por PROFESSOR----
 exports.getQuestoes = async (req,res)=>{
   const questoes = await QuestaoModel.getQuestoes();
   try{
@@ -36,41 +37,35 @@ exports.getQuestoes = async (req,res)=>{
   }
 }
 
-//Função para criar a questão
-exports.criar = async (body) => {
+//----Função para ADICIONAR uma QUESTÃO----
+exports.criar = async (req, res) => {
   try {
-    const newQuestionId = await QuestaoModel.create(body);
+    const newQuestionId = await QuestaoModel.create(req.body);
     const questionDetails = await QuestaoModel.getQuestionDetails(
       newQuestionId
     );
 
-    return {
+    return res.status(200).json({
       status: 200,
       msg: "Questão adicionada com sucesso...",
       resp: [questionDetails],
-    };
+    })
   } catch (error) {
     console.error("Erro ao adicionar a questão:", error);
-    return {
+    return res.status(200).json({
       status: "error",
       msg: "Ops! ocorreu um erro fatal ao adicionar a questão...",
-    };
+    })
   }
 };
 
-//Função para editar a questão
+//----Função para ATUALIZAR uma QUESTÃO----
 exports.editar = async (req, res) => {
   const idQuestao = req.params.id;
   const { tipo, nivel, enunciado, Enunciado_imagem, resposta } = req.body;
   try {
-    const updatedQuestion = await QuestaoModel.editarQuestao(
-      tipo,
-      nivel,
-      enunciado,
-      Enunciado_imagem,
-      resposta,
-      idQuestao
-    );
+    const updatedQuestion = await QuestaoModel.editarQuestao(tipo, nivel, enunciado, Enunciado_imagem, resposta, idQuestao);
+    console.log(updatedQuestion);
     if (updatedQuestion) {
       return res.json({
         status: "success",
@@ -91,7 +86,7 @@ exports.editar = async (req, res) => {
   }
 };
 
-//Função para excluir a questão
+//----Função para DELETAR uma QUESTÃO----
 exports.excluir = async (req, res) => {
   const idQuestao = req.params.id;
   try {
@@ -115,7 +110,7 @@ exports.excluir = async (req, res) => {
   }
 };
 
-//Função para obter uma questao específica pelo id
+//----Função para OBTER uma QUESTÃO específica pelo ID----
 exports.obterQuestao = async (req, res) => {
   const idQuestao = req.params.id;
   try {
@@ -140,7 +135,7 @@ exports.obterQuestao = async (req, res) => {
   }
 };
 
-//Função para obter uma questao específica pelo enunciado
+//----Função para BUSCAR uma QUESTÃO específica pelo ENUNCIADO----
 exports.buscarQuestoesPorEnunciado = async (req, res) => {
   const enunciado = req.params.enunciado;
   try {

@@ -2,7 +2,7 @@ const connection = require("./mysqlConnect").query();
 const fs = require("fs");
 const path = require("path");
 
-// Função para obter todas as questões
+//----Função para LISTAR as QUESTÕES por PROFESSOR----
 const get = (idProfessor) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -74,7 +74,7 @@ const get = (idProfessor) => {
             }
           });
 
-          //Ordena as questões por ID de forma decrescente (da mais nova para a mais antiga) e resolve a Promise com o array de questões          
+          //----Ordena as QUESTÕES por ID de forma DESCRESCENTE----      
           const listaQuestoes = Object.values(questoes);
           listaQuestoes.sort((a, b) => b.id_questao - a.id_questao);
           resolve(Object.values(listaQuestoes));
@@ -84,7 +84,7 @@ const get = (idProfessor) => {
   })
 };
 
-// Função para obter todas as questões
+//----Função para LISTAS as QUESTÕES----
 const getQuestoes = (id) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -155,7 +155,7 @@ const getQuestoes = (id) => {
             }
           });
 
-          //Ordena as questões por ID de forma decrescente (da mais nova para a mais antiga) e resolve a Promise com o array de questões          
+          //----Ordena as QUESTÕES por ID de forma DESCRESCENTE----       
           const listaQuestoes = Object.values(questoes);
           listaQuestoes.sort((a, b) => b.id_questao - a.id_questao);
           resolve(Object.values(listaQuestoes));
@@ -165,23 +165,20 @@ const getQuestoes = (id) => {
   })
 };
 
-// Função para criar uma nova questão
+//----FUNÇÃO PARA ADICIONAR QUESTÃO----
 const create = (data) => {
   return new Promise((resolve, reject) => {
-    const {
-      enunciado,
-      Enunciado_imagem,
-      tipo,
-      nivel,
-      resposta,
-      topico_enunciado,
-      professor_nome,
-    } = data;
+    const { enunciado, Enunciado_imagem, tipo, nivel, resposta, topico_enunciado, professor_nome} = data;
+
+    //----Função TRIM para não permitir campo vazios nas COLUNAS----
+    if(enunciado.trim() ==='' || tipo.trim() ==='' || nivel.trim() ==='' || topico_enunciado ==='' || professor_nome.trim() ===''){
+      throw new Error('Os campos não podem ser vazios.');
+    }
 
     let professor_pessoa_id_pessoa;
     let topico_id_topico;
 
-    // Busca o ID do professor com base no nome
+    //----Busca o ID do PROF----
     connection.query(
       `SELECT pr.pessoa_id_pessoa FROM professor pr
          JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
@@ -198,7 +195,7 @@ const create = (data) => {
         }
         professor_pessoa_id_pessoa = results[0].pessoa_id_pessoa;
 
-        // Busca o ID do tópico com base no enunciado
+        //----Busca o ID do TÓPICO com base no ENUNCIADO----
         connection.query(
           `SELECT id_topico FROM topico WHERE enunciado = ?`,
           [topico_enunciado],
@@ -215,20 +212,11 @@ const create = (data) => {
 
             topico_id_topico = results[0].id_topico;
 
-            // Insere a nova questão na tabela 'questao'
             connection.query(
               `INSERT INTO infocimol.questao 
                 (enunciado, tipo, nivel, resposta, professor_pessoa_id_pessoa, topico_id_topico, Enunciado_imagem)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-              [
-                enunciado,
-                tipo,
-                nivel,
-                resposta,
-                professor_pessoa_id_pessoa,
-                topico_id_topico,
-                Enunciado_imagem,
-              ],
+              [enunciado, tipo, nivel, resposta, professor_pessoa_id_pessoa, topico_id_topico, Enunciado_imagem],
               (error, result) => {
                 if (error) {
                   reject(error);
@@ -236,7 +224,7 @@ const create = (data) => {
                 }
                 const novoIdQuestao = result.insertId;
 
-                resolve(novoIdQuestao); // Resolve com o ID da nova questão
+                resolve(novoIdQuestao); //----Resolve com o ID da NOVA questão----
               }
             );
           }
@@ -246,7 +234,7 @@ const create = (data) => {
   });
 };
 
-// Função para obter detalhes de uma questão por ID
+//----Função para OBTER os DETALHES de uma QUESTÃO por ID----
 const getQuestionDetails = (idQuestao) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -294,14 +282,12 @@ const getQuestionDetails = (idQuestao) => {
 };
 
 //Função para editar questao por ID
-const editarQuestao = async (
-  tipo,
-  nivel,
-  enunciado,
-  Enunciado_imagem,
-  resposta,
-  idQuestao
-) => {
+const editarQuestao = async ( tipo,  nivel, enunciado, Enunciado_imagem, resposta, idQuestao) => {
+  //----Função TRIM para não permitir campo vazios nas COLUNAS----
+  if(enunciado.trim() ==='' || tipo.trim() ==='' || nivel.trim() ===''){
+    throw new Error('Os campos não podem ser vazios.');
+  }
+
   try {
     const resultados = await new Promise((resolve, reject) => {
       connection.query(
@@ -309,7 +295,7 @@ const editarQuestao = async (
         [tipo, nivel, enunciado, Enunciado_imagem, resposta, idQuestao],
         (error, resultados) => {
           if (error) {
-            reject(error); // Rejeita a Promise em caso de erro
+            reject(error); //----Rejeita a Promise em caso de ERRO----
           } else {
             resolve(resultados);
           }
@@ -317,13 +303,14 @@ const editarQuestao = async (
       );
     });
     const updatedQuestion = await getQuestionDetails(idQuestao);
+    console.log(resultados);
     return updatedQuestion;
   } catch (error) {
     throw error;
   }
 };
 
-//Função para excluir questao por ID
+//----Função para DELETAR uma QUESTÃO por ID----
 const excluirQuestao = async (idQuestao) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -332,7 +319,7 @@ const excluirQuestao = async (idQuestao) => {
         [idQuestao],
         (error, resultados) => {
           if (error) {
-            reject(error); // Rejeita a Promise em caso de erro
+            reject(error); //----Rejeita a Promise em caso de ERRO----
           } else {
             resolve(resultados);
           }
@@ -349,7 +336,7 @@ const excluirQuestao = async (idQuestao) => {
   }
 };
 
-// Função para obter todas as alternativas de uma questão
+//----Função para OBTER todas as ALTERNATIVAS de uma QUESTÃO----
 const getAlternativas = async (idQuestao) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -376,7 +363,7 @@ const getAlternativas = async (idQuestao) => {
   }
 };
 
-//Função para obter uma questao específico pelo seu ID
+//----Função para OBTER uma QUESTÃO específico pelo seu ID----
 const verQuestao = async (idQuestao) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -426,6 +413,7 @@ const verQuestao = async (idQuestao) => {
   }
 };
 
+//----Função para BUSCAR pelo ENUNCIADO da QUESTÃO----
 const buscarQuestoesPorEnunciado = async (enunciado) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
