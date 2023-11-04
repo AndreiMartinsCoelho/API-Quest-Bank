@@ -198,7 +198,7 @@ exports.gerarProva = async (req, res) => {
       stream.pipe(res);
     });
 
-    stream.on("end", () => {
+    res.on("finish", () => {
       fs.unlinkSync(nomeArquivo); //----Remova o PDF após o ENVIO----
     });
 
