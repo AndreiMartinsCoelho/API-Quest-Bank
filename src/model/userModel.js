@@ -3,6 +3,22 @@ require("dotenv").config();
 const connection = require("./mysqlConnect").query();
 const nodemailer = require("nodemailer");
 
+// Função para buscar todos os usuários
+const get = async () => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      "SELECT *, (SELECT nome FROM pessoa WHERE id=u.pessoa_id_pessoa) as nome FROM usuario u",
+      (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      }
+    );
+  });
+};
+
 // Função para fazer login
 const login = async (data) => {
   const bcrypt = require("bcrypt");
