@@ -2,12 +2,20 @@ const connection = require("./mysqlConnect").query();
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 
-//Função para criar uma prova
+//----Função para ADICIONAR uma PROVA----
 const criar = (novaProva) => {
   return new Promise((resolve, reject) => {
     connection.beginTransaction(async (err) => {
       if (err) {
         reject(err);
+        return;
+      }
+
+      //----Função TRIM para não permitir campo vazios nas COLUNAS----
+      if (novaProva.tipo.trim() === "" || novaProva.descricao.trim() === "" || novaProva.enunciado.trim() === ""){
+        connection.rollback(() =>
+          reject(new Error("Enunciado, descrição e tipo não podem ser vazios."))
+        );
         return;
       }
 
@@ -53,7 +61,8 @@ const criar = (novaProva) => {
   });
 };
 
-//Função para obter as prova
+
+//----Função para LISTAR varias PROVAS de um PROFESSOR----
 const listar = (idProfessor) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -91,7 +100,7 @@ const listar = (idProfessor) => {
   });
 };
 
-//Função para obter as prova sem idProfessor
+//----Função para LISTAR todas as PROVAS do BD----
 const getProvas = (id) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -128,7 +137,7 @@ const getProvas = (id) => {
   });
 };
 
-//Função para obter as questões de uma prova
+//----Função para OBTER as QUESTÕES de uma PROVA----
 const getQuestoes = (provaId) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -177,7 +186,7 @@ const getQuestoes = (provaId) => {
   });
 };
 
-//Função para obter as alternativas de uma questão
+//----Função para OBTER as ALTERNATIVAS de uma QUESTÃO----
 const getAlternativas = (questaoId) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -199,7 +208,7 @@ const getAlternativas = (questaoId) => {
   });
 };
 
-//Função para inserir as questões de uma prova
+//----Função para INSERIR as QUESTÕES para uma PROVA----
 const inserirQuestoes = (provaId, questoes) => {
   return new Promise((resolve, reject) => {
     const values = questoes.map((questaoId) => [questaoId, provaId]);
@@ -217,8 +226,13 @@ const inserirQuestoes = (provaId, questoes) => {
   });
 };
 
-//Função para editar uma prova
+//----Função para ATUALIZAR uma PROVA----
 const editarProva = (enunciado, descricao, tipo, idProva) => {
+  //----Função TRIM para não permitir campo vazios nas COLUNAS----
+  if (enunciado.trim() === "" || descricao.trim() === "" || tipo.trim() === ""){
+    throw new Error("Enunciado, descrição e tipo não podem ser vazios.");
+  }
+
   return new Promise((resolve, reject) => {
     connection.query(
       `SELECT * FROM prova WHERE id_prova = ?`,
@@ -230,7 +244,7 @@ const editarProva = (enunciado, descricao, tipo, idProva) => {
           reject(new Error(`Prova com id ${idProva} não existe no banco.`));
         } else {
           const prova = results[0];
-          // Update the prova information in the database
+          //----ATUALIZA AS INFOs no BD----
           connection.query(
             `UPDATE prova SET descricao = ?, tipo = ?, enunciado = ? WHERE id_prova = ?`,
             [descricao, tipo, enunciado, idProva],
@@ -256,7 +270,7 @@ const editarProva = (enunciado, descricao, tipo, idProva) => {
   });
 };
 
-//Função para excluir prova
+//----Função para DELETAR uma PROVA----
 const excluirProva = (idProva) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -285,7 +299,7 @@ const excluirProva = (idProva) => {
   });
 };
 
-//Função para buscar uma prova pelo enunciado
+//Função para fazer uma BUSCA pelo ENUNCIADO de uma PROVA----
 const buscarProvaPorEnunciado = (enunciado) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -322,12 +336,12 @@ const buscarProvaPorEnunciado = (enunciado) => {
   });
 };
 
-//Função para gerar a prova em PDF
+//----Função para GERAR um PDF----
 const gerarPDF = (prova) => {
   if (!prova || !prova.id_prova) {
     throw new Error("Prova inválida");
   }
-  const imagePath ="./src/model/img/logo.jpeg";
+  const imagePath = "./src/model/img/logo.jpeg";
   const nomeArquivo = `prova_${prova.id_prova}.pdf`;
   const stream = fs.createWriteStream(nomeArquivo);
   const doc = new PDFDocument();
@@ -371,7 +385,7 @@ const gerarPDF = (prova) => {
     .text(`${prova.descricao}`, { align: "left" })
     .moveDown(0.5);
 
-  //Array que armazena as questões da prova em ordem aleatória
+  //----Array que armazena as QUESTÕES da PROVA em ordem aleatória----
   function ArrayRandom(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -380,9 +394,9 @@ const gerarPDF = (prova) => {
     return array;
   }
 
-  // Adiciona as questões da prova
+  //----Adiciona as QUESTÕES da PROVA----
   if (prova.questoes && prova.questoes.length > 0) {
-    //Questões da prova em ordem aleatória
+    //----Questões da PROVA em ORDEM aleatória----
     const QuestoesRandom = ArrayRandom(prova.questoes);
     QuestoesRandom.forEach((questao, index) => {
       doc
@@ -390,7 +404,7 @@ const gerarPDF = (prova) => {
         .fontSize(12)
         .text(`${index + 1}) ${questao.questao_enunciado}`, { align: "left" });
 
-      //Alternativas de cada questão em ordem aleatória
+      //Alternativas de cada QUESTÃO em ORDEM aleatória----
       if (questao.alternativas && questao.alternativas.length > 0) {
         const RandomAlternativas = ArrayRandom(questao.alternativas);
         RandomAlternativas.forEach((alternativa, index) => {
@@ -401,7 +415,7 @@ const gerarPDF = (prova) => {
         });
       }
 
-      // // Adiciona a resposta correta da questão
+      //----Adiciona a RES CORRETA da questão----
 
       doc.moveDown(0.5);
     });
@@ -413,11 +427,11 @@ const gerarPDF = (prova) => {
 
   doc.pipe(stream);
   doc.end();
-  
+
   return nomeArquivo;
 };
 
-//Função para obter uma prova específico pelo seu ID
+//----Função para OBTER uma PROVA específico pelo seu ID----
 const obterProvaPorId = async (idProva) => {
   try {
     const resultados = await new Promise((resolve, reject) => {
@@ -430,7 +444,7 @@ const obterProvaPorId = async (idProva) => {
         [idProva],
         (error, resultados) => {
           if (error) {
-            resolve(null); // Retorna null em caso de erro
+            resolve(null); //----Retorna NULL em caso de erro----
           } else {
             resolve(resultados);
           }
@@ -448,11 +462,11 @@ const obterProvaPorId = async (idProva) => {
       },
       descricao: prova.descricao,
       questoes: questoes,
-    }))[0]; // Retorna apenas o primeiro elemento do array
+    }))[0]; //----Retorna apenas o primeiro elemento do ARRAY----
 
     return prova;
   } catch (error) {
-    return null; // Retorna null em caso de erro
+    return null; //----Retorna NULL em caso de erro----
   }
 };
 
@@ -467,5 +481,5 @@ module.exports = {
   getAlternativas,
   buscarProvaPorEnunciado,
   gerarPDF,
-  getProvas
+  getProvas,
 };

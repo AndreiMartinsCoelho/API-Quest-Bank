@@ -399,15 +399,4 @@ const obterTopicoPorEnunciado = (enunciado) => {
   });
 };
 
-module.exports = {
-  criarTopico,
-  obterIdDisciplinaPorNome,
-  obterTodosOsTopicos,
-  obterNovoIdTopico,
-  excluir,
-  editar,
-  obterTopicoPorId,
-  obterNomeDisciplina,
-  obterTopicoPorEnunciado,
-  getTopicos
-};
+module.exports = { criarTopico, obterIdDisciplinaPorNome, obterTodosOsTopicos, obterNovoIdTopico, excluir, editar, obterTopicoPorId,  obterNomeDisciplina, obterTopicoPorEnunciado, getTopicos};

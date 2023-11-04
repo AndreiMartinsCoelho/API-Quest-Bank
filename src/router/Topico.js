@@ -10,7 +10,7 @@ TopicoRouter.get('/topico/listar', Middleware.verifyToken, TopicoController.get)
 TopicoRouter.get('/topicos/listar', Middleware.verifyToken, TopicoController.getTodosTopicos);
 
 //Rota para criar o tópico
-TopicoRouter.post('/topico/adicionar', Middleware.verifyToken, async(req, res, next) => {
+TopicoRouter.post('/topico/adicionar', /*Middleware.verifyToken,*/ async(req, res, next) => {
     const data = req.body;
     const result = await TopicoController.criar(data);
     res.status(200).send(result);
@@ -20,7 +20,7 @@ TopicoRouter.post('/topico/adicionar', Middleware.verifyToken, async(req, res, n
 TopicoRouter.delete('/topico/deletar/:id', Middleware.verifyToken, TopicoController.excluir);
 
 //Rota para atualizar o tópico
-TopicoRouter.put('/topico/atualizar/:id', Middleware.verifyToken, TopicoController.editar);
+TopicoRouter.put('/topico/atualizar/:id', /*Middleware.verifyToken,*/ TopicoController.editar);
 
 //Rota para obter um tópico específico pelo seu ID
 TopicoRouter.get('/topico/listar/:id', Middleware.verifyToken, TopicoController.listaId);
