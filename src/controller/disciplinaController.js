@@ -10,7 +10,7 @@ exports.listar = async (req, res) => {
         disciplinas,
       })
     } catch (error) {
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
         msg: "Ocorreu um erro ao buscar as disciplinas. Tente novamente mais tarde.",
       })
@@ -28,7 +28,7 @@ exports.getById = async (req, res) => {
     } catch (error) {
         //----Tratamento de ERRO caso não ACHE a DISCIPLINA----
         console.error("Erro ao obter disciplina:", error);
-        return res.status(500).json({ 
+        return res.status(404).json({ 
           status: "error", msg: "Ocorreu um erro ao obter a disciplina. Por favor, tente novamente mais tarde." 
         })
     }

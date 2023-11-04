@@ -19,7 +19,7 @@ exports.sendVerificationCode = async (req, res) => {
     res.status(200).json({ codigo });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Erro ao enviar código de verificação." });
+    res.status(404).json({ message: "Erro ao enviar código de verificação." });
   }
 };
 
@@ -31,6 +31,6 @@ exports.updatePassword = async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Erro ao atualizar senha do usuário." });
+    res.status(404).json({ message: "Erro ao atualizar senha do usuário." });
   }
 };

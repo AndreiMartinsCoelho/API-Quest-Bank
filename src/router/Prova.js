@@ -25,6 +25,6 @@ ProvaRouter.get('/prova/listar/:id', Middleware.verifyToken, ProvaController.obt
 ProvaRouter.get('/prova/buscar/:enunciado', Middleware.verifyToken, ProvaController.buscarProvaPorEnunciado);
 
 //----ROTA para GERAR um PDF----
-ProvaRouter.get('/prova/download/:id', Middleware.verifyToken, ProvaController.gerarProva);
+ProvaRouter.get('/prova/download/:id', /*Middleware.verifyToken,*/ ProvaController.gerarProva);
 
 module.exports = ProvaRouter;
