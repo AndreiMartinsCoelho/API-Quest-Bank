@@ -1,17 +1,24 @@
 const userModel = require("../model/userModel");
 const nodemailer = require('nodemailer');
 
-//Função para realizar o login do usuário
-exports.login = async (body) => {
-  const result = await userModel.login(body);
+//----Função para REALIZAR o LOGIN do USER----
+exports.login = async (req, res) => {
+  const result = await userModel.login(req.body);
   if (result.auth) {
-    return { auth: true, token: result.token, user: result.user };
+    return res.status(200).json({ 
+      auth: true, 
+      token: result.token, 
+      user: result.user 
+    })
   } else {
-    return { auth: false, message: "Credenciais inválidas" };
+    return res.status(404).json({ 
+      auth: false,
+       message: "Credenciais inválidas" 
+    })
   }
 };
 
-//Função para trocar a senha do usuário
+//----Função para ENVIAR o EMIAL para USER----
 exports.sendVerificationCode = async (req, res) => {
   const { email } = req.body;
   try {
@@ -23,7 +30,7 @@ exports.sendVerificationCode = async (req, res) => {
   }
 };
 
-//Função para trocar a senha do usuário
+//----Função para TROCAR a SENHA do USER----
 exports.updatePassword = async (req, res) => {
   const { email, novaSenha, confirmSenha, codigo } = req.body;
   try {
