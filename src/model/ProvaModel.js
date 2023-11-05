@@ -342,7 +342,7 @@ const gerarPDF = (prova) => {
     throw new Error("Prova inválida");
   }
   const imagePath = "./src/model/img/logo.jpeg";
-  const nomeArquivo = `prova_${prova.id_prova}.pdf`;
+  const nomeArquivo = `prova_${prova.enunciado}.pdf`;
   const stream = fs.createWriteStream(nomeArquivo);
   const doc = new PDFDocument();
   doc.info.Title = `Prova ${prova.id_prova}`;
@@ -351,30 +351,50 @@ const gerarPDF = (prova) => {
 
   const yPos = doc.y + 20;
 
-  doc.image(imagePath, 50, yPos, { width: larguraImagem });
+  doc.image(imagePath, 48, yPos, { width: larguraImagem });
 
   doc
     .font("Helvetica-Bold")
     .fontSize(16)
     .text(
       "ESCOLA TÉCNICA ESTADUAL MONTEIRO LOBATO",
-      50 + larguraImagem + 15,
+      60 + larguraImagem + 15,
       yPos
     );
-  if (prova.questoes && prova.questoes.length > 0) {
-    const QuestoesRandom = ArrayRandom(prova.questoes);
-    QuestoesRandom.forEach((questao, index) => {
-      doc
-        .font("Helvetica")
-        .fontSize(12)
-        .text(
-          `${questao.topicos.disciplina.questao_topico_disciplina_nome} - ${prova.criado_por.professor_nome}`,
-          50 + larguraImagem + 15,
-          doc.y + 10
-        );
-    });
-  }
+    if (prova.questoes && prova.questoes.length > 0) {
+      const QuestoesRandom = ArrayRandom(prova.questoes);
+      if (QuestoesRandom.length > 0) {
+        doc
+          .font("Helvetica")
+          .fontSize(12)
+          .text(
+            `${QuestoesRandom[0].topicos.disciplina.questao_topico_disciplina_nome} - ${prova.criado_por.professor_nome}`,
+            60 + larguraImagem + 15,
+            doc.y + 10
+          );
+      }
+    }  doc
+    .font("Helvetica")
+    .fontSize(12)
+    .text("      Peso:", (doc.page.width / 3) * 2, 120);
 
+    
+    doc.moveDown(2);
+
+
+    doc
+    .roundedRect(45, doc.y, doc.page.width - 105, 50, 10)
+    .stroke();
+  
+    doc
+    .font("Helvetica")
+    .fontSize(12)
+    .text("        Nome: ____________   Turma: ___  Data: _//_ ", 31, doc.y + 19);
+  
+ 
+  
+    doc.moveDown(1);
+  
   doc
     .font("Helvetica-Bold")
     .fontSize(12)
@@ -384,7 +404,7 @@ const gerarPDF = (prova) => {
     .fontSize(12)
     .text(`${prova.descricao}`, { align: "left" })
     .moveDown(0.5);
-
+    doc.moveDown(2);
   //----Array que armazena as QUESTÕES da PROVA em ordem aleatória----
   function ArrayRandom(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -402,22 +422,23 @@ const gerarPDF = (prova) => {
       doc
         .font("Helvetica")
         .fontSize(12)
-        .text(`${index + 1}) ${questao.questao_enunciado}`, { align: "left" });
-
+        .text(`${index + 1}) ${questao.questao_enunciado}`, { align: "justify" });
+      doc.moveDown(1);
       //Alternativas de cada QUESTÃO em ORDEM aleatória----
       if (questao.alternativas && questao.alternativas.length > 0) {
         const RandomAlternativas = ArrayRandom(questao.alternativas);
         RandomAlternativas.forEach((alternativa, index) => {
           doc.text(
             `${String.fromCharCode(97 + index)}) ${alternativa.enunciado}`,
-            { align: "left", indent: 20 }
+            { align: "justify", indent: 20 }
           );
+          doc.moveDown(0.8);
         });
       }
 
       //----Adiciona a RES CORRETA da questão----
 
-      doc.moveDown(0.5);
+      doc.moveDown(1);
     });
   }
 
