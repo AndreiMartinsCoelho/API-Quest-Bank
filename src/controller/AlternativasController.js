@@ -18,15 +18,15 @@ exports.get = async (req, res) => {
 };
 
 //----Função para ADICIONAR a ALTERNATIVA----
-exports.criar = async (req, res) => {
+exports.criar = async (data) => {
   try {
-    const { enunciado, enunciadoQuestao, correta } = req.body;
+    const { enunciado, enunciadoQuestao, correta } = data;
 
     if (!enunciado || !enunciadoQuestao || !correta) {
-      return res.status(404).json({
+      return {
         status: "error",
         msg: "Por favor, preencha todos os campos corretamente...",
-      })
+      };
     }
 
     const questaoId = await AlternativasModel.obterIdQuestaoPorEnunciado(
@@ -34,30 +34,27 @@ exports.criar = async (req, res) => {
     );
 
     if (!questaoId) {
-      return res.status(404).json({
+      return {
         status: "error",
         msg: "Por favor, preencha todos os campos corretamente...",
-      })
+      };
     }
 
     const newAlternative = await AlternativasModel.criarAlternativa(
-      enunciado,
-      questaoId,
       correta
     );
 
-    return res.status(200).json({
+    return {
       status: "success",
       msg: "Alternativa adicionada com sucesso...",
       alternativa: newAlternative,
-    })
-
+    };
   } catch (error) {
     console.error("Erro ao adicionar alternativa...", error);
-    return res.status(404).json({
+    return {
       status: "error",
       msg: "Ops! Ocorreu algum erro ao adicionar a alternativa...",
-    })
+    };
   }
 };
 
