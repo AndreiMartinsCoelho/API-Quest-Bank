@@ -12,8 +12,8 @@ const list = (data) => {
           reject(error);
         } else {
           const disciplines = rows.map((row) => ({
-            value: row.id_disciplina,
-            label: row.nome,
+            id: row.id_disciplina,
+            nome: row.nome,
           }));
           resolve(disciplines);
         }
