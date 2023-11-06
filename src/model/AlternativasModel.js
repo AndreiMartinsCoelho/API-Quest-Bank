@@ -3,7 +3,7 @@ const connection = require("./mysqlConnect").query();
 //----Função para criar um alternativa----
 const criarAlternativa = async (enunciado, idQuestao, correta) => {
   //----Função TRIM para não permitir campo vazios nas COLUNAS----
-  if (enunciado.trim() === '' || correta.trim() === '' ) {
+  if (enunciado.trim() === '') {
     throw new Error('Enunciado e correta não podem ser vazios.');
   }
   //----Se tiver tudo OK, cria a ALTERNATIVA
