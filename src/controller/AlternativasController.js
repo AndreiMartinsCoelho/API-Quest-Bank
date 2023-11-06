@@ -41,6 +41,8 @@ exports.criar = async (data) => {
     }
 
     const newAlternative = await AlternativasModel.criarAlternativa(
+      enunciado,
+      questaoId,
       correta
     );
 
