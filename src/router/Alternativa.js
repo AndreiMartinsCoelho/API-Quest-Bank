@@ -4,7 +4,7 @@ const AlternativasController = require('../controller/AlternativasController');
 const Middleware = require('../middleware/auth');
 
 //----Rota para LISTAR as ALTERNATIVAS----
-AlternativasRouter.get('/alternativa/listar', /*Middleware.verifyToken,*/ AlternativasController.get)
+AlternativasRouter.get('/alternativa/listar', Middleware.verifyToken, AlternativasController.get)
 
 //----Rota para LISTAR as ALTERNATIVAS----
 AlternativasRouter.post('/alternativa/adicionar', Middleware.verifyToken, async(req, res, next)=>{
