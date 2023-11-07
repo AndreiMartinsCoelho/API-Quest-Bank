@@ -389,7 +389,7 @@ const gerarPDF = (prova) => {
     doc
     .font("Helvetica")
     .fontSize(12)
-    .text("        Nome: ____________   Turma: ___  Data: _//_ ", 31, doc.y + 19);
+    .text("        Nome: ___________________________________   Turma: ________  Data: __/__/____ ", 31, doc.y + 19);
   
  
   
