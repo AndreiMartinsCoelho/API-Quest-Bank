@@ -19,6 +19,44 @@ exports.get = async (req, res) => {
   }
 };
 
+//----Função para LISTAR as QUESTÕES por Topico enunciado----
+exports.getQuestoesPorTopico = async (req, res) => {
+  const idTopico = req.query.idTopico;
+  try {
+    const questoes = await QuestaoModel.getQuestoesPorTopico(idTopico);
+    res.status(200).json({
+      status: "success",
+      msg: "Questões obtidas com sucesso...",
+      questoes: questoes,
+    });
+  } catch (error) {
+    console.error("Erro ao listar as questões:", error);
+    res.status(404).json({
+      status: "error",
+      msg: "Ops! Ocorreu algum erro...",
+    });
+  }
+};
+
+//----Função para LISTAR as QUESTÕES por NIVEL----
+exports.getQuestoesPorNivel = async (req, res) => {
+  const nivel = req.query.nivel;
+  try {
+    const questoes = await QuestaoModel.getQuestoesPorNivel(nivel);
+    res.status(200).json({
+      status: "success",
+      msg: "Questões obtidas com sucesso...",
+      questoes: questoes,
+    });
+  } catch (error) {
+    console.error("Erro ao listar as questões:", error);
+    res.status(404).json({
+      status: "error",
+      msg: "Ops! Ocorreu algum erro...",
+    });
+  }
+};
+
 //----Função para LISTAR as QUESTÕES sem ser por PROFESSOR----
 exports.getQuestoes = async (req,res)=>{
   const questoes = await QuestaoModel.getQuestoes();

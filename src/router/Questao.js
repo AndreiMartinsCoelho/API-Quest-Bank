@@ -9,6 +9,12 @@ QuestaoRouter.get('/questao/listar', Middleware.verifyToken, QuestaoController.g
 //----ROTA para LISTAR as QUESTÕES sem PROFESSOR----
 QuestaoRouter.get('/questoes/listar', Middleware.verifyToken, QuestaoController.getQuestoes);
 
+//----ROTA para LISTAR as QUESTÕES por TÓPICO----
+QuestaoRouter.get('/questao/listar/topico', Middleware.verifyToken, QuestaoController.getQuestoesPorTopico);
+
+//----ROTA para LISTAR as QUESTÕES por NÍVEL----
+QuestaoRouter.get('/questao/listar/nivel', Middleware.verifyToken, QuestaoController.getQuestoesPorNivel);
+
 //----ROTA para ADICIONAR a QUESTÃO----
 QuestaoRouter.post('/questao/adicionar', Middleware.verifyToken, QuestaoController.criar);
 

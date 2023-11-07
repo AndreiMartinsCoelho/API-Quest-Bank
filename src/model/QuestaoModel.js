@@ -84,6 +84,170 @@ const get = (idProfessor) => {
   })
 };
 
+//----Função para LISTAR as QUESTÕES por TOPICO----
+const getQuestoesPorTopico = (idTopico) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, t.disciplina_id_disciplina, d.nome AS disciplina_nome, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
+          a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
+          FROM infocimol.questao q
+          JOIN topico t ON q.topico_id_topico = t.id_topico
+          JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+          JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+          JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+          LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao
+          WHERE q.topico_id_topico = ?
+          ORDER BY q.id_questao ASC`,
+      [idTopico],
+      (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          const questoes = {};
+          results.forEach((row) => {
+            const {
+              id_questao,
+              enunciado,
+              Enunciado_imagem,
+              tipo,
+              nivel,
+              resposta,
+              professor_nome,
+              professor_pessoa_id_pessoa,
+              topico_id_topico,
+              topico_enunciado,
+              disciplina_id_disciplina,
+              disciplina_nome,
+              id_alternativa,
+              correta,
+              alternativa_enunciado,
+            } = row;
+
+            if (!questoes[id_questao]) {
+              questoes[id_questao] = {
+                id_questao,
+                enunciado,
+                Enunciado_imagem,
+                tipo,
+                nivel,
+                resposta,
+                professor: {
+                  professor_id_professor: professor_pessoa_id_pessoa,
+                  professor_nome,
+                },
+                topico: {
+                  topico_id_topico,
+                  topico_enunciado,
+                  disciplina: {
+                    disciplina_id_disciplina,
+                    disciplina_nome,
+                  },
+                },
+                alternativas: [],
+              };
+            }
+
+            if (id_alternativa) {
+              questoes[id_questao].alternativas.push({
+                id_alternativa,
+                correta,
+                enunciado: alternativa_enunciado,
+              });
+            }
+          });
+
+          //----Ordena as QUESTÕES por ID de forma DESCRESCENTE----      
+          const listaQuestoes = Object.values(questoes);
+          listaQuestoes.sort((a, b) => b.id_questao - a.id_questao);
+          resolve(Object.values(listaQuestoes));
+        }
+      }
+    );
+  })
+};
+
+//----Função para LISTAR as QUESTÕES por NIVEL----
+const getQuestoesPorNivel = (Nivel) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `SELECT q.id_questao, q.enunciado, q.topico_id_topico, t.enunciado AS topico_enunciado, t.disciplina_id_disciplina, d.nome AS disciplina_nome, q.tipo, q.nivel, q.Enunciado_imagem, q.resposta, p.nome AS professor_nome, q.professor_pessoa_id_pessoa,
+          a.id_alternativa, a.correta, a.enunciado AS alternativa_enunciado
+          FROM infocimol.questao q
+          JOIN topico t ON q.topico_id_topico = t.id_topico
+          JOIN disciplina d ON t.disciplina_id_disciplina = d.id_disciplina
+          JOIN professor pr ON q.professor_pessoa_id_pessoa = pr.pessoa_id_pessoa
+          JOIN pessoa p ON pr.pessoa_id_pessoa = p.id_pessoa
+          LEFT JOIN alternativa a ON q.id_questao = a.questao_id_questao
+          WHERE q.nivel = ?
+          ORDER BY q.id_questao ASC`,
+      [Nivel],
+      (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          const questoes = {};
+          results.forEach((row) => {
+            const {
+              id_questao,
+              enunciado,
+              Enunciado_imagem,
+              tipo,
+              nivel,
+              resposta,
+              professor_nome,
+              professor_pessoa_id_pessoa,
+              topico_id_topico,
+              topico_enunciado,
+              disciplina_id_disciplina,
+              disciplina_nome,
+              id_alternativa,
+              correta,
+              alternativa_enunciado,
+            } = row;
+
+            if (!questoes[id_questao]) {
+              questoes[id_questao] = {
+                id_questao,
+                enunciado,
+                Enunciado_imagem,
+                tipo,
+                nivel,
+                resposta,
+                professor: {
+                  professor_id_professor: professor_pessoa_id_pessoa,
+                  professor_nome,
+                },
+                topico: {
+                  topico_id_topico,
+                  topico_enunciado,
+                  disciplina: {
+                    disciplina_id_disciplina,
+                    disciplina_nome,
+                  },
+                },
+                alternativas: [],
+              };
+            }
+
+            if (id_alternativa) {
+              questoes[id_questao].alternativas.push({
+                id_alternativa,
+                correta,
+                enunciado: alternativa_enunciado,
+              });
+            }
+          });
+
+          //----Ordena as QUESTÕES por ID de forma DESCRESCENTE----      
+          const listaQuestoes = Object.values(questoes);
+          listaQuestoes.sort((a, b) => b.id_questao - a.id_questao);
+          resolve(Object.values(listaQuestoes));
+        }
+      }
+    );
+  })
+};
+
 //----Função para LISTAS as QUESTÕES----
 const getQuestoes = (id) => {
   return new Promise((resolve, reject) => {
@@ -471,5 +635,7 @@ module.exports = {
   verQuestao,
   getAlternativas,
   buscarQuestoesPorEnunciado,
-  getQuestoes
+  getQuestoes,
+  getQuestoesPorTopico,
+  getQuestoesPorNivel
 };
