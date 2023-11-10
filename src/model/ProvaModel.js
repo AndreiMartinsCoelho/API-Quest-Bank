@@ -172,6 +172,7 @@ const getProvas = (id) => {
   });
 };
 
+//----Função para OBTER as QUESTÕES de uma PROVA----
 const getQuestoes = (provaId) => {
   return new Promise((resolve, reject) => {
     connection.query(
