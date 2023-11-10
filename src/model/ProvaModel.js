@@ -1,6 +1,39 @@
 const connection = require("./mysqlConnect").query();
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
+const util = require('util');
+
+//----Função para INSERIR as QUESTÕES para uma PROVA----
+const inserirQuestaoPorEnunciado = async (provaId, questaoEnunciado) => {
+  return new Promise(async (resolve, reject) => {
+    const insertQuery = `
+      INSERT INTO infocimol.questao_prova (questao_id_questao, prova_id_prova)
+      VALUES (?, ?);
+    `;
+    const queryAsync = util.promisify(connection.query).bind(connection);
+
+    try {
+      const [result] = await queryAsync(
+        `SELECT id_questao FROM questao WHERE enunciado = ?`,
+        [questaoEnunciado]
+      );
+
+      if (result && result.id_questao) {
+        connection.query(insertQuery, [result.id_questao, provaId], (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        });
+      } else {
+        reject(new Error(`Questão com enunciado "${questaoEnunciado}" não encontrada.`));
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 //----Função para ADICIONAR uma PROVA----
 const criar = (novaProva) => {
@@ -10,7 +43,6 @@ const criar = (novaProva) => {
         reject(err);
         return;
       }
-
       //----Função TRIM para não permitir campo vazios nas COLUNAS----
       if (novaProva.tipo.trim() === "" || novaProva.descricao.trim() === "" || novaProva.enunciado.trim() === ""){
         connection.rollback(() =>
@@ -35,7 +67,11 @@ const criar = (novaProva) => {
             const novaProvaId = result.insertId;
 
             try {
-              await inserirQuestoes(novaProvaId, novaProva.questoes);
+              if (novaProva.questoes && novaProva.questoes.length > 0) {
+                await Promise.all(novaProva.questoes.map(async (enunciado) => {
+                  await inserirQuestaoPorEnunciado(novaProvaId, enunciado);
+                }));
+              }
               connection.commit(() => {
                 connection.query(
                   `SELECT * FROM infocimol.prova WHERE id_prova = ?;`,
@@ -60,7 +96,6 @@ const criar = (novaProva) => {
     });
   });
 };
-
 
 //----Função para LISTAR varias PROVAS de um PROFESSOR----
 const listar = (idProfessor) => {
@@ -137,7 +172,6 @@ const getProvas = (id) => {
   });
 };
 
-//----Função para OBTER as QUESTÕES de uma PROVA----
 const getQuestoes = (provaId) => {
   return new Promise((resolve, reject) => {
     connection.query(
@@ -205,24 +239,6 @@ const getAlternativas = (questaoId) => {
         }
       }
     );
-  });
-};
-
-//----Função para INSERIR as QUESTÕES para uma PROVA----
-const inserirQuestoes = (provaId, questoes) => {
-  return new Promise((resolve, reject) => {
-    const values = questoes.map((questaoId) => [questaoId, provaId]);
-    const insertQuery = `
-      INSERT INTO infocimol.questao_prova (questao_id_questao, prova_id_prova)
-      VALUES ?;
-    `;
-    connection.query(insertQuery, [values], (error, result) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(result);
-      }
-    });
   });
 };
 
@@ -495,7 +511,6 @@ module.exports = {
   criar,
   listar,
   getQuestoes,
-  inserirQuestoes,
   editarProva,
   excluirProva,
   obterProvaPorId,

@@ -10,7 +10,7 @@ ProvaRouter.get('/prova/listar', Middleware.verifyToken, ProvaController.listar)
 ProvaRouter.get('/provas/listar', Middleware.verifyToken, ProvaController.listarProvas);
 
 //----ROTA para ADICIONAR a PROVA----
-ProvaRouter.post('/prova/adicionar', Middleware.verifyToken, ProvaController.criar);
+ProvaRouter.post('/prova/adicionar', /*Middleware.verifyToken,*/ ProvaController.criar);
 
 //----ROTA para ATUALIZAR a PROVA----
 ProvaRouter.put('/prova/atualizar/:id', Middleware.verifyToken, ProvaController.editar);

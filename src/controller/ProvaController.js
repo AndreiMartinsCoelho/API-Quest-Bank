@@ -45,18 +45,18 @@ exports.criar = async (req, res) => {
     if (result.novaProvaId) {
       const provaCriada = result.provaDetalhes;
 
-      const questoes = result.questoes.map((questaoId) => {
+      const questoes = result.questoes.map((questao) => {
         const questaoEncontrada = req.body.questoes.find(
-          (questao) => questao.id_questao === questaoId
+          (questaoBody) => questaoBody.enunciado === questao.enunciado
         );
 
         if (questaoEncontrada) {
           return {
-            enunciado_questao: questaoId,
+            enunciado_questao: questaoEncontrada.enunciado,
           };
         } else {
           return {
-            questao: questaoId,
+            questao: questao.id_questao,
           };
         }
       });
