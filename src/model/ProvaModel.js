@@ -488,8 +488,13 @@ const gabarito = prova.questoes.map((questao, index) => {
     (alternativa) => alternativa.correta === 1
   );
 
-  const letraAlternativa = alternativasMapeadas[alternativaCorreta.enunciado];
-  return `${index + 1}) ${questao.questao_enunciado} - Resposta correta: ${letraAlternativa}) ${alternativaCorreta.enunciado}`;
+  if (alternativaCorreta) {
+    const letraAlternativa = alternativasMapeadas[alternativaCorreta.enunciado];
+    return `${index + 1})Resposta correta: ${letraAlternativa}) ${alternativaCorreta.enunciado}`;
+  } else {
+    console.log(`Questão ${index + 1} não tem alternativa correta`);
+    return `${index + 1})Sem resposta correta`;
+  }
 });
 
 // Adiciona uma nova página para o gabarito
