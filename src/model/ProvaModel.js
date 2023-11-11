@@ -1,7 +1,7 @@
 const connection = require("./mysqlConnect").query();
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
-const util = require('util');
+const util = require("util");
 
 //----Função para INSERIR as QUESTÕES para uma PROVA----
 const inserirQuestaoPorEnunciado = async (provaId, questaoEnunciado) => {
@@ -19,15 +19,23 @@ const inserirQuestaoPorEnunciado = async (provaId, questaoEnunciado) => {
       );
 
       if (result && result.id_questao) {
-        connection.query(insertQuery, [result.id_questao, provaId], (error, result) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(result);
+        connection.query(
+          insertQuery,
+          [result.id_questao, provaId],
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
           }
-        });
+        );
       } else {
-        reject(new Error(`Questão com enunciado "${questaoEnunciado}" não encontrada.`));
+        reject(
+          new Error(
+            `Questão com enunciado "${questaoEnunciado}" não encontrada.`
+          )
+        );
       }
     } catch (error) {
       reject(error);
@@ -44,7 +52,11 @@ const criar = (novaProva) => {
         return;
       }
       //----Função TRIM para não permitir campo vazios nas COLUNAS----
-      if (novaProva.tipo.trim() === "" || novaProva.descricao.trim() === "" || novaProva.enunciado.trim() === ""){
+      if (
+        novaProva.tipo.trim() === "" ||
+        novaProva.descricao.trim() === "" ||
+        novaProva.enunciado.trim() === ""
+      ) {
         connection.rollback(() =>
           reject(new Error("Enunciado, descrição e tipo não podem ser vazios."))
         );
@@ -68,9 +80,11 @@ const criar = (novaProva) => {
 
             try {
               if (novaProva.questoes && novaProva.questoes.length > 0) {
-                await Promise.all(novaProva.questoes.map(async (enunciado) => {
-                  await inserirQuestaoPorEnunciado(novaProvaId, enunciado);
-                }));
+                await Promise.all(
+                  novaProva.questoes.map(async (enunciado) => {
+                    await inserirQuestaoPorEnunciado(novaProvaId, enunciado);
+                  })
+                );
               }
               connection.commit(() => {
                 connection.query(
@@ -82,6 +96,7 @@ const criar = (novaProva) => {
                     } else {
                       const provaDetalhes = results[0];
                       const questoes = await getQuestoes(novaProvaId);
+                      console.log(questoes);
                       resolve({ novaProvaId, provaDetalhes, questoes });
                     }
                   }
@@ -246,7 +261,11 @@ const getAlternativas = (questaoId) => {
 //----Função para ATUALIZAR uma PROVA----
 const editarProva = (enunciado, descricao, tipo, idProva) => {
   //----Função TRIM para não permitir campo vazios nas COLUNAS----
-  if (enunciado.trim() === "" || descricao.trim() === "" || tipo.trim() === ""){
+  if (
+    enunciado.trim() === "" ||
+    descricao.trim() === "" ||
+    tipo.trim() === ""
+  ) {
     throw new Error("Enunciado, descrição e tipo não podem ser vazios.");
   }
 
@@ -378,40 +397,39 @@ const gerarPDF = (prova) => {
       60 + larguraImagem + 15,
       yPos
     );
-    if (prova.questoes && prova.questoes.length > 0) {
-      const QuestoesRandom = ArrayRandom(prova.questoes);
-      if (QuestoesRandom.length > 0) {
-        doc
-          .font("Helvetica")
-          .fontSize(12)
-          .text(
-            `${QuestoesRandom[0].topicos.disciplina.questao_topico_disciplina_nome} - ${prova.criado_por.professor_nome}`,
-            60 + larguraImagem + 15,
-            doc.y + 10
-          );
-      }
-    }  doc
+  if (prova.questoes && prova.questoes.length > 0) {
+    const QuestoesRandom = ArrayRandom(prova.questoes);
+    if (QuestoesRandom.length > 0) {
+      doc
+        .font("Helvetica")
+        .fontSize(12)
+        .text(
+          `${QuestoesRandom[0].topicos.disciplina.questao_topico_disciplina_nome} - ${prova.criado_por.professor_nome}`,
+          60 + larguraImagem + 15,
+          doc.y + 10
+        );
+    }
+  }
+  doc
     .font("Helvetica")
     .fontSize(12)
-    .text("      Peso:", (doc.page.width / 3) * 2, 120);
+    .text("      Nota:", (doc.page.width / 3) * 2, 120);
 
-    
-    doc.moveDown(2);
+  doc.moveDown(2);
 
+  doc.roundedRect(45, doc.y, doc.page.width - 105, 50, 10).stroke();
 
-    doc
-    .roundedRect(45, doc.y, doc.page.width - 105, 50, 10)
-    .stroke();
-  
-    doc
+  doc
     .font("Helvetica")
     .fontSize(12)
-    .text("        Nome: ___________________________________   Turma: ________  Data: __/__/____ ", 31, doc.y + 19);
-  
- 
-  
-    doc.moveDown(1);
-  
+    .text(
+      "        Nome: ___________________________________   Turma: ________  Data: __/__/____ ",
+      31,
+      doc.y + 19
+    );
+
+  doc.moveDown(1);
+
   doc
     .font("Helvetica-Bold")
     .fontSize(12)
@@ -421,7 +439,7 @@ const gerarPDF = (prova) => {
     .fontSize(12)
     .text(`${prova.descricao}`, { align: "left" })
     .moveDown(0.5);
-    doc.moveDown(2);
+  doc.moveDown(2);
   //----Array que armazena as QUESTÕES da PROVA em ordem aleatória----
   function ArrayRandom(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -439,7 +457,9 @@ const gerarPDF = (prova) => {
       doc
         .font("Helvetica")
         .fontSize(12)
-        .text(`${index + 1}) ${questao.questao_enunciado}`, { align: "justify" });
+        .text(`${index + 1}) ${questao.questao_enunciado}`, {
+          align: "justify",
+        });
       doc.moveDown(1);
       //Alternativas de cada QUESTÃO em ORDEM aleatória----
       if (questao.alternativas && questao.alternativas.length > 0) {
@@ -453,21 +473,50 @@ const gerarPDF = (prova) => {
         });
       }
 
-      //----Adiciona a RES CORRETA da questão----
-
       doc.moveDown(1);
     });
   }
 
-  stream.on("finish", () => {
-    console.log(`Arquivo ${nomeArquivo} gerado com sucesso`);
-  });
+//----Adiciona o GABARITO da PROVA com as QUESTOES e ALTERNATIVAS CORRETAS----
+const gabarito = prova.questoes.map((questao, index) => {
+  const alternativasMapeadas = questao.alternativas.reduce((map, alt, i) => {
+    map[alt.enunciado] = String.fromCharCode(97 + i);
+    return map;
+  }, {});
 
-  doc.pipe(stream);
-  doc.end();
+  const alternativaCorreta = questao.alternativas.find(
+    (alternativa) => alternativa.correta === 1
+  );
 
-  return nomeArquivo;
-};
+  const letraAlternativa = alternativasMapeadas[alternativaCorreta.enunciado];
+  return `${index + 1}) ${questao.questao_enunciado} - Resposta correta: ${letraAlternativa}) ${alternativaCorreta.enunciado}`;
+});
+
+// Adiciona uma nova página para o gabarito
+doc.addPage();
+
+//----Adiciona o gabarito ao PDF----
+doc.font("Helvetica-Bold").fontSize(12).text(`Gabarito`, 50, doc.y);
+
+let linhaAtual = 0;
+
+gabarito.forEach((item, index) => {
+  doc
+    .font("Helvetica")
+    .fontSize(12)
+    .text(item, 50, doc.y + 10 + linhaAtual * 20, { align: "justify" })
+    .moveDown(0.5);
+});
+
+stream.on("finish", () => {
+  console.log(`Arquivo ${nomeArquivo} gerado com sucesso`);
+});
+
+doc.pipe(stream);
+doc.end();
+
+return nomeArquivo;
+}
 
 //----Função para OBTER uma PROVA específico pelo seu ID----
 const obterProvaPorId = async (idProva) => {
