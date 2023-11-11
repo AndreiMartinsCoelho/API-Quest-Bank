@@ -47,16 +47,18 @@ exports.criar = async (req, res) => {
 
       const questoes = result.questoes.map((questao) => {
         const questaoEncontrada = req.body.questoes.find(
-          (questaoBody) => questaoBody.enunciado === questao.enunciado
+          (questaoBody) => questaoBody.enunciado === questao.questao_enunciado
         );
 
         if (questaoEncontrada) {
           return {
             enunciado_questao: questaoEncontrada.enunciado,
+            questao: questao,
           };
         } else {
           return {
-            questao: questao.id_questao,
+            id_questao: questao.questao_id,
+            questao: questao,
           };
         }
       });
@@ -193,15 +195,15 @@ exports.gerarProva = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename=${nomeArquivo}`);
     const stream = fs.createReadStream(nomeArquivo);
-
+    
     stream.on("open", () => {
       stream.pipe(res);
     });
-
+    
     res.on("finish", () => {
       fs.unlinkSync(nomeArquivo); //----Remova o PDF após o ENVIO----
     });
-
+    
     stream.on("error", (err) => {
       console.error(err);
       res.status(404).json({ 
