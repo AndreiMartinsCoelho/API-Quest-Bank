@@ -4,7 +4,7 @@ const QuestaoController = require('../controller/QuestaoController');
 const Middleware = require('../middleware/auth');
 
 //----ROTA para LISTAR as QUESTÕES pelo PROFESSOR----
-QuestaoRouter.get('/questao/listar', Middleware.verifyToken, QuestaoController.get);
+QuestaoRouter.get('/questao/listar', /*Middleware.verifyToken,*/ QuestaoController.get);
 
 //----ROTA para LISTAR as QUESTÕES sem PROFESSOR----
 QuestaoRouter.get('/questoes/listar', Middleware.verifyToken, QuestaoController.getQuestoes);
@@ -19,7 +19,7 @@ QuestaoRouter.get('/questao/listar/nivel', Middleware.verifyToken, QuestaoContro
 QuestaoRouter.post('/questao/adicionar', Middleware.verifyToken, QuestaoController.criar);
 
 //----ROTA para ATUALIZAR a QUESTÃO----
-QuestaoRouter.put('/questao/atualizar/:id', Middleware.verifyToken, QuestaoController.editar);
+QuestaoRouter.put('/questao/atualizar/:id', /*Middleware.verifyToken,*/ QuestaoController.editar);
 
 //----ROTA para DELETAR a QUESTÃO----
 QuestaoRouter.delete('/questao/deletar/:id', Middleware.verifyToken, QuestaoController.excluir);

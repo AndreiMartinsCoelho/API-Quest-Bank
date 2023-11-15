@@ -16,7 +16,7 @@ TopicoRouter.post('/topico/adicionar', Middleware.verifyToken, TopicoController.
 TopicoRouter.delete('/topico/deletar/:id', Middleware.verifyToken, TopicoController.excluir);
 
 //----Rota para ATUALIZAR um TOPICO----
-TopicoRouter.put('/topico/atualizar/:id', Middleware.verifyToken, TopicoController.editar);
+TopicoRouter.put('/topico/atualizar/:id', /*Middleware.verifyToken,*/ TopicoController.editar);
 
 //----Rota para LISTAR um TOPICO específico pelo seu ID----
 TopicoRouter.get('/topico/listar/:id', Middleware.verifyToken, TopicoController.listaId);

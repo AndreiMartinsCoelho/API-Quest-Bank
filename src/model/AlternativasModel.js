@@ -165,18 +165,20 @@ const obterNovoIdAlternativa = async () => {
 };
 
 //----Função para ATUALIZAR a ALTERNATIVA----
-const editarAlternativa = async (enunciado, correta, idAlternativa) => {
+const editarAlternativa = async (enunciado, correta, idAlternativa, enunciadoQuestao) => {
   //----Função TRIM para não permitir campo vazios nas COLUNAS----
   if (enunciado.trim() === '' || correta.trim() === '') {
     throw new Error('Enunciado e correta não podem ser vazios.');
   }
 
+  const idQuestao = await obterIdQuestaoPorEnunciado(enunciadoQuestao);
+  
   //----Se tiver tudo OK, ATUALIZA a alternativa----
   try {
     await new Promise((resolve, reject) => {
       connection.query(
-        `UPDATE alternativa SET enunciado = ?, correta = ? WHERE id_alternativa = ?`,
-        [enunciado, correta, idAlternativa],
+        `UPDATE alternativa SET enunciado = ?, correta = ?, questao_id_questao = ? WHERE id_alternativa = ?`,
+        [enunciado, correta, idQuestao, idAlternativa],
         (error) => {
           if (error || "") {
             resolve(null); //----Retorna NULL em caso de erro----

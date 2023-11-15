@@ -112,9 +112,9 @@ exports.excluir = async (req, res) => {
 //----Função para ATUALIZAR um TOPICO----
 exports.editar = async (req, res) => {
   const idTopico = req.params.id;
-  const enunciado = req.body.enunciado.toString();
+  const { enunciado, nomeDisciplina } = req.body;
   try {
-    const result = await TopicoModel.editar(idTopico, enunciado);
+    const result = await TopicoModel.editar(idTopico, enunciado, nomeDisciplina);
     if (result) {
       return res.status(200).json({
         status: "success",
