@@ -100,9 +100,9 @@ exports.criar = async (req, res) => {
 //----Função para ATUALIZAR uma QUESTÃO----
 exports.editar = async (req, res) => {
   const idQuestao = req.params.id;
-  const { tipo, nivel, enunciado, Enunciado_imagem, resposta } = req.body;
+  const { tipo, nivel, enunciado, Enunciado_imagem, resposta, enunciadoTopico } = req.body;
   try {
-    const updatedQuestion = await QuestaoModel.editarQuestao(tipo, nivel, enunciado, Enunciado_imagem, resposta, idQuestao);
+    const updatedQuestion = await QuestaoModel.editarQuestao(tipo, nivel, enunciado, Enunciado_imagem, resposta, enunciadoTopico, idQuestao);
     console.log(updatedQuestion);
     if (updatedQuestion) {
       return res.status(200).json({
@@ -123,7 +123,6 @@ exports.editar = async (req, res) => {
     });
   }
 };
-
 //----Função para DELETAR uma QUESTÃO----
 exports.excluir = async (req, res) => {
   const idQuestao = req.params.id;

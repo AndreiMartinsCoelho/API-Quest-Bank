@@ -445,18 +445,45 @@ const getQuestionDetails = (idQuestao) => {
   });
 };
 
+//----Função para OBTER o ID do TÓPICO com base no ENUNCIADO----
+const getIdTopicoPorEnunciado = async (enunciadoTopico) => {
+  try {
+    const resultado = await new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT id_topico FROM topico WHERE enunciado = ?`,
+        [enunciadoTopico],
+        (error, resultados) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(resultados);
+          }
+        }
+      );
+    });
+    if (resultado.length > 0) {
+      return resultado[0].id_topico;
+    } else {
+      throw new Error("Tópico não encontrado");
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 //Função para editar questao por ID
-const editarQuestao = async ( tipo,  nivel, enunciado, Enunciado_imagem, resposta, idQuestao) => {
+const editarQuestao = async (tipo, nivel, enunciado, Enunciado_imagem, resposta, enunciadoTopico, idQuestao) => {
   //----Função TRIM para não permitir campo vazios nas COLUNAS----
-  if(enunciado.trim() ==='' || tipo.trim() ==='' || nivel.trim() ===''){
-    throw new Error('Os campos não podem ser vazios.');
+  if (enunciado.trim() === "" || tipo.trim() === "" || nivel.trim() === "") {
+    throw new Error("Os campos não podem ser vazios.");
   }
 
   try {
+    const idTopico = await getIdTopicoPorEnunciado(enunciadoTopico);
     const resultados = await new Promise((resolve, reject) => {
       connection.query(
-        `UPDATE questao SET tipo = ?, nivel = ?, enunciado = ?, Enunciado_imagem = ?, resposta = ? WHERE id_questao = ?`,
-        [tipo, nivel, enunciado, Enunciado_imagem, resposta, idQuestao],
+        `UPDATE questao SET tipo = ?, nivel = ?, enunciado = ?, Enunciado_imagem = ?, resposta = ?, topico_id_topico = ? WHERE id_questao = ?`,
+        [tipo, nivel, enunciado, Enunciado_imagem, resposta, idTopico, idQuestao],
         (error, resultados) => {
           if (error) {
             reject(error); //----Rejeita a Promise em caso de ERRO----

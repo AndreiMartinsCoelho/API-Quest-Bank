@@ -4,7 +4,7 @@ const AlternativasController = require('../controller/AlternativasController');
 const Middleware = require('../middleware/auth');
 
 //----Rota para LISTAR as ALTERNATIVAS----
-AlternativasRouter.get('/alternativa/listar', Middleware.verifyToken, AlternativasController.get)
+AlternativasRouter.get('/alternativa/listar', /*Middleware.verifyToken,*/ AlternativasController.get)
 
 //----Rota para LISTAR as ALTERNATIVAS----
 AlternativasRouter.post('/alternativa/adicionar', Middleware.verifyToken, async(req, res, next)=>{
@@ -13,7 +13,7 @@ AlternativasRouter.post('/alternativa/adicionar', Middleware.verifyToken, async(
 })
 
 //----Rota para ATUALIZAR as ALTERNATIVAS----
-AlternativasRouter.put('/alternativa/atualizar/:id', Middleware.verifyToken, AlternativasController.editar);
+AlternativasRouter.put('/alternativa/atualizar/:id', /*Middleware.verifyToken,*/ AlternativasController.editar);
 
 //----Rota para DELETAR as ALTERNATIVAS----
 AlternativasRouter.delete('/alternativa/deletar/:id', Middleware.verifyToken, AlternativasController.excluir);

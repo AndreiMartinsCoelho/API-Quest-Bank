@@ -295,16 +295,18 @@ const excluir = async (idTopico) => {
 };
 
 //----Função para ATUALIZAR um TOPICO----
-const editar = async (idTopico, enunciado) => {
+const editar = async (idTopico, enunciado, nomeDisciplina) => {
     //----Função TRIM para não permitir campo vazios nas COLUNAS----
-    if (enunciado.trim() === '') {
+    if (enunciado.trim() === '' || nomeDisciplina.trim() === '') {
       throw new Error('Enunciado e disciplina não podem ser vazios.');
     }
   try {
+    const idDisciplina = await obterIdDisciplinaPorNome(nomeDisciplina);
+
     await new Promise((resolve, reject) => {
       connection.query(
-        `UPDATE topico SET enunciado = ? WHERE id_topico = ?`,
-        [enunciado, idTopico],
+        `UPDATE topico SET enunciado = ?, disciplina_id_disciplina = ? WHERE id_topico = ?`,
+        [enunciado, idDisciplina, idTopico],
         (error) => {
           if (error) {
             reject(error); //----Rejeita o erro em caso de FALHA----

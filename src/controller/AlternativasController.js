@@ -62,30 +62,42 @@ exports.criar = async (data) => {
 
 //----Função para EDITAR a ALTERNATIVA----
 exports.editar = async (req, res) => {
-    const idAlternativa = req.params.id;
-    const { enunciado, correta } = req.body;
-    try {
-        const success = await AlternativasModel.editarAlternativa(enunciado, correta, idAlternativa);
-
-        if(!enunciado || !correta){
-          return res.status(404).json({
-            stauts:"error",
-            msg:"Ops! Ocorreu algum erro ao atualizar a alternativa..."
-          })
-        }else{
-          return res.status(200).json({
-            status: "success",
-            msg: "Alternativa atualizada com sucesso...",
-            alternativa: success
-          });
-        }
-    } catch (error) {
-        return res.status(404).json({
-            status: "error",
-            msg: "Ops! Ocorreu algum erro ao atualizar a alternativa..."
-        });
+  const idAlternativa = req.params.id;
+  const { enunciado, correta, enunciadoQuestao } = req.body;
+  try {
+    if (!enunciado || !correta || !enunciadoQuestao) {
+      return res.status(400).json({
+        status: "error",
+        msg: "Enunciado, correta e enunciado da questão são campos obrigatórios",
+      });
     }
-}
+
+    const alternativaEditada = await AlternativasModel.editarAlternativa(
+      enunciado,
+      correta,
+      idAlternativa,
+      enunciadoQuestao
+    );
+
+    if (!alternativaEditada) {
+      return res.status(500).json({
+        status: "error",
+        msg: "Ops! Ocorreu algum erro ao atualizar a alternativa...",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      msg: "Alternativa atualizada com sucesso...",
+      alternativa: alternativaEditada,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      msg: "Ops! Ocorreu algum erro ao atualizar a alternativa...",
+    });
+  }
+};
 
 //----Função para DELETAR a ALTERNATIVA----
 exports.excluir = async (req, res) => {
