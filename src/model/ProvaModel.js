@@ -491,9 +491,12 @@ const gabarito = prova.questoes.map((questao, index) => {
   if (alternativaCorreta) {
     const letraAlternativa = alternativasMapeadas[alternativaCorreta.enunciado];
     return `${index + 1})Resposta correta: ${letraAlternativa}) ${alternativaCorreta.enunciado}`;
-  } else {
-    console.log(`Questão ${index + 1} não tem alternativa correta`);
-    return `${index + 1})Sem resposta correta`;
+  } else if(questao.questao_tipo === 'Dissertativa'){
+    console.log(`Questão ${index + 1} é dissertativa`);
+    return `${index + 1})Resposta esperada: ${questao.questao_resposta}`;
+  }else if (alternativaCorreta === undefined){
+    console.log(`Questão ${index + 1} não possui resposta correta`);
+    return `${index + 1})Não possui resposta correta`;
   }
 });
 
