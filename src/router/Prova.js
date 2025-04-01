@@ -4,7 +4,7 @@ const ProvaController = require('../controller/ProvaController');
 const Middleware = require('../middleware/auth');
 
 //----ROTA para LISTAR as PROVAs por PROFESSOR----
-ProvaRouter.get('/prova/listar', Middleware.verifyToken, ProvaController.listar);
+ProvaRouter.get('/prova/listar', Middleware.verifyToken, ProvaController.listar); //teste
 
 //----ROTA para LISTAR as PROVAs sem PROFESSOR----
 ProvaRouter.get('/provas/listar', Middleware.verifyToken, ProvaController.listarProvas);
